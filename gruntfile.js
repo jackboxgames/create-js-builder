@@ -11,6 +11,7 @@ module.exports = function (grunt) {
 		uglify: {
 			options: {
 				banner: grunt.file.read('LICENSE'),
+				footer: grunt.file.read('FOOTER'),
 				preserveComments: "some",
 				compress: {
 					global_defs: {
@@ -20,7 +21,7 @@ module.exports = function (grunt) {
 			},
 			build: {
 				files: {
-					'builds/createjs-<%= grunt.template.today("yyyy.mm.dd") %>.min.js': getCombinedSource(true)
+					'builds/create.min.js': getCombinedSource(true)
 				}
 			}
 		},
@@ -28,6 +29,7 @@ module.exports = function (grunt) {
 			options: {
 				separator: '',
 				banner: grunt.file.read("BANNER"),
+				footer: grunt.file.read("FOOTER"),
 				process: function (src, filepath) {
 					// Remove a few things from each file, they will be added back at the end.
 
@@ -35,7 +37,7 @@ module.exports = function (grunt) {
 					var file = src.replace(/^(\/\*\s)[\s\S]+?\*\//, "")
 
 					// Strip namespace
-					file = file.replace(/(this.createjs)\s=\s\1.*/, "");
+					file = file.replace(/(createjsScope.createjs)\s=\s\1.*/, "");
 
 					// Strip namespace label
 					file = file.replace(/\/\/\s*namespace:/, "");
@@ -59,7 +61,7 @@ module.exports = function (grunt) {
 			},
 			build: {
 				files: {
-					'builds/createjs-<%= grunt.template.today("yyyy.mm.dd") %>.combined.js': getCombinedSource(true)
+					'builds/create.js': getCombinedSource(true)
 				}
 			}
 		},

@@ -26,4 +26,5 @@
 * OTHER DEALINGS IN THE SOFTWARE.
 */
 
-this.createjs = this.createjs||{};
+var createjsScope = (typeof window === 'undefined' ? this : window);
+createjsScope.createjs = createjsScope.createjs||{};

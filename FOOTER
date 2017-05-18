@@ -1,0 +1,5 @@
+/*
+* Adding module.exports
+*/
+
+module.exports = createjsScope.createjs;

@@ -1,5 +1,5 @@
 {
-  "name": "CreateJS",
+  "name": "create-js-builder",
   "version": "0.8.2",
   "description": "CreateJS",
   "url": "http://www.createjs.com",
@@ -18,5 +18,6 @@
     "inline-source": "4.2.0",
     "lodash": "~2.4.1"
   },
-  "engine": "node >= 0.10.22"
+  "engine": "node >= 0.10.22",
+  "main": "./builds/create.min.js"
 }
