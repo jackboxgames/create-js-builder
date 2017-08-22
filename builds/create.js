@@ -197,6 +197,48 @@ createjs.indexOf = function (array, searchElement){
 }());
 
 //##############################################################################
+// deprecate.js
+//##############################################################################
+
+this.createjs = this.createjs||{};
+
+/**
+ * @class Utility Methods
+ */
+
+/**
+ * Wraps deprecated methods so they still be used, but throw warnings to developers.
+ *
+ *	obj.deprecatedMethod = createjs.deprecate("Old Method Name", obj._fallbackMethod);
+ *
+ * The recommended approach for deprecated properties is:
+ *
+ *	try {
+ *		Obj	ect.defineProperties(object, {
+ *			readyOnlyProp: { get: createjs.deprecate("readOnlyProp", function() { return this.alternateProp; }) },
+ *			readWriteProp: {
+ *				get: createjs.deprecate("readOnlyProp", function() { return this.alternateProp; }),
+ *				set: createjs.deprecate("readOnlyProp", function(val) { this.alternateProp = val; })
+ *		});
+ *	} catch (e) {}
+ *
+ * @method deprecate
+ * @param {Function} [fallbackMethod=null] A method to call when the deprecated method is used. See the example for how
+ * @param {String} [name=null] The name of the method or property to display in the console warning.
+ * to deprecate properties.
+ * @return {Function} If a fallbackMethod is supplied, returns a closure that will call the fallback method after
+ * logging the warning in the console.
+ */
+createjs.deprecate = function(fallbackMethod, name) {
+	"use strict";
+	return function() {
+		var msg = "Deprecated property or method '"+name+"'. See docs for info.";
+		console && (console.warn ? console.warn(msg) : console.log(msg));
+		return fallbackMethod && fallbackMethod.apply(this, arguments);
+	}
+};
+
+//##############################################################################
 // Event.js
 //##############################################################################
 
@@ -329,19 +371,6 @@ createjs.indexOf = function (array, searchElement){
 		this.removed = false;
 	}
 	var p = Event.prototype;
-
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
 
 // public methods:
 	/**
@@ -503,20 +532,6 @@ createjs.indexOf = function (array, searchElement){
 		this._captureListeners = null;
 	}
 	var p = EventDispatcher.prototype;
-
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
 
 // static public methods:
 	/**
@@ -904,7 +919,7 @@ createjs.indexOf = function (array, searchElement){
 // static events:
 	/**
 	 * Dispatched each tick. The event will be dispatched to each listener even when the Ticker has been paused using
-	 * {{#crossLink "Ticker/setPaused"}}{{/crossLink}}.
+	 * {{#crossLink "Ticker/paused:property"}}{{/crossLink}}.
 	 *
 	 * <h4>Example</h4>
 	 *
@@ -927,20 +942,9 @@ createjs.indexOf = function (array, searchElement){
 
 // public static properties:
 	/**
-	 * Deprecated in favour of {{#crossLink "Ticker/timingMode"}}{{/crossLink}}, and will be removed in a future version. If true, timingMode will
-	 * use {{#crossLink "Ticker/RAF_SYNCHED"}}{{/crossLink}} by default.
-	 * @deprecated Deprecated in favour of {{#crossLink "Ticker/timingMode"}}{{/crossLink}}.
-	 * @property useRAF
-	 * @static
-	 * @type {Boolean}
-	 * @default false
-	 **/
-	Ticker.useRAF = false;
-
-	/**
 	 * Specifies the timing api (setTimeout or requestAnimationFrame) and mode to use. See
-	 * {{#crossLink "Ticker/TIMEOUT"}}{{/crossLink}}, {{#crossLink "Ticker/RAF"}}{{/crossLink}}, and
-	 * {{#crossLink "Ticker/RAF_SYNCHED"}}{{/crossLink}} for mode details.
+	 * {{#crossLink "Ticker/TIMEOUT:property"}}{{/crossLink}}, {{#crossLink "Ticker/RAF:property"}}{{/crossLink}}, and
+	 * {{#crossLink "Ticker/RAF_SYNCHED:property"}}{{/crossLink}} for mode details.
 	 * @property timingMode
 	 * @static
 	 * @type {String}
@@ -1009,7 +1013,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @property _inited
 	 * @static
 	 * @type {Boolean}
-	 * @protected
+	 * @private
 	 **/
 	Ticker._inited = false;
 
@@ -1017,7 +1021,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @property _startTime
 	 * @static
 	 * @type {Number}
-	 * @protected
+	 * @private
 	 **/
 	Ticker._startTime = 0;
 
@@ -1025,7 +1029,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @property _pausedTime
 	 * @static
 	 * @type {Number}
-	 * @protected
+	 * @private
 	 **/
 	Ticker._pausedTime=0;
 
@@ -1034,7 +1038,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @property _ticks
 	 * @static
 	 * @type {Number}
-	 * @protected
+	 * @private
 	 **/
 	Ticker._ticks = 0;
 
@@ -1043,7 +1047,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @property _pausedTicks
 	 * @static
 	 * @type {Number}
-	 * @protected
+	 * @private
 	 **/
 	Ticker._pausedTicks = 0;
 
@@ -1051,7 +1055,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @property _interval
 	 * @static
 	 * @type {Number}
-	 * @protected
+	 * @private
 	 **/
 	Ticker._interval = 50;
 
@@ -1059,7 +1063,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @property _lastTime
 	 * @static
 	 * @type {Number}
-	 * @protected
+	 * @private
 	 **/
 	Ticker._lastTime = 0;
 
@@ -1067,7 +1071,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @property _times
 	 * @static
 	 * @type {Array}
-	 * @protected
+	 * @private
 	 **/
 	Ticker._times = null;
 
@@ -1075,7 +1079,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @property _tickTimes
 	 * @static
 	 * @type {Array}
-	 * @protected
+	 * @private
 	 **/
 	Ticker._tickTimes = null;
 
@@ -1084,7 +1088,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @property _timerId
 	 * @static
 	 * @type {Number}
-	 * @protected
+	 * @private
 	 **/
 	Ticker._timerId = null;
 	
@@ -1094,7 +1098,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @property _raf
 	 * @static
 	 * @type {Boolean}
-	 * @protected
+	 * @private
 	 **/
 	Ticker._raf = true;
 	
@@ -1102,49 +1106,57 @@ createjs.indexOf = function (array, searchElement){
 // static getter / setters:
 	/**
 	 * Use the {{#crossLink "Ticker/interval:property"}}{{/crossLink}} property instead.
-	 * @method setInterval
+	 * @method _setInterval
+	 * @private
 	 * @static
 	 * @param {Number} interval
-	 * @deprecated
 	 **/
-	Ticker.setInterval = function(interval) {
+	Ticker._setInterval = function(interval) {
 		Ticker._interval = interval;
 		if (!Ticker._inited) { return; }
 		Ticker._setupTick();
 	};
+	// Ticker.setInterval is @deprecated. Remove for 1.1+
+	Ticker.setInterval = createjs.deprecate(Ticker._setInterval, "Ticker.setInterval");
 
 	/**
 	 * Use the {{#crossLink "Ticker/interval:property"}}{{/crossLink}} property instead.
-	 * @method getInterval
+	 * @method _getInterval
+	 * @private
 	 * @static
 	 * @return {Number}
-	 * @deprecated
 	 **/
-	Ticker.getInterval = function() {
+	Ticker._getInterval = function() {
 		return Ticker._interval;
 	};
+	// Ticker.getInterval is @deprecated. Remove for 1.1+
+	Ticker.getInterval = createjs.deprecate(Ticker._getInterval, "Ticker.getInterval");
 
 	/**
 	 * Use the {{#crossLink "Ticker/framerate:property"}}{{/crossLink}} property instead.
-	 * @method setFPS
+	 * @method _setFPS
+	 * @private
 	 * @static
 	 * @param {Number} value
-	 * @deprecated
 	 **/
-	Ticker.setFPS = function(value) {
-		Ticker.setInterval(1000/value);
+	Ticker._setFPS = function(value) {
+		Ticker._setInterval(1000/value);
 	};
+	// Ticker.setFPS is @deprecated. Remove for 1.1+
+	Ticker.setFPS = createjs.deprecate(Ticker._setFPS, "Ticker.setFPS");
 
 	/**
 	 * Use the {{#crossLink "Ticker/framerate:property"}}{{/crossLink}} property instead.
-	 * @method getFPS
+	 * @method _getFPS
 	 * @static
+	 * @private
 	 * @return {Number}
-	 * @deprecated
 	 **/
-	Ticker.getFPS = function() {
+	Ticker._getFPS = function() {
 		return 1000/Ticker._interval;
 	};
+	// Ticker.getFPS is @deprecated. Remove for 1.1+
+	Ticker.getFPS = createjs.deprecate(Ticker._getFPS, "Ticker.getFPS");
 
 	/**
 	 * Indicates the target time (in milliseconds) between ticks. Default is 50 (20 FPS).
@@ -1164,8 +1176,8 @@ createjs.indexOf = function (array, searchElement){
 	 **/
 	try {
 		Object.defineProperties(Ticker, {
-			interval: { get: Ticker.getInterval, set: Ticker.setInterval },
-			framerate: { get: Ticker.getFPS, set: Ticker.setFPS }
+			interval: { get: Ticker._getInterval, set: Ticker._setInterval },
+			framerate: { get: Ticker._getFPS, set: Ticker._setFPS }
 		});
 	} catch (e) { console.log(e); }
 
@@ -1212,9 +1224,10 @@ createjs.indexOf = function (array, searchElement){
 	 * the end of one tick and the end of the next. However, getMeasuredTickTime() returns 15ms. This indicates that 
 	 * there may be up to 35ms of "idle" time between the end of one tick and the start of the next.
 	 *
-	 * Example 2: With a target FPS of 30, getFPS() returns 10fps, which indicates an average of 100ms between the end of
-	 * one tick and the end of the next. However, getMeasuredTickTime() returns 20ms. This would indicate that something
-	 * other than the tick is using ~80ms (another script, DOM rendering, etc).
+	 * Example 2: With a target FPS of 30, {{#crossLink "Ticker/framerate:property"}}{{/crossLink}} returns 10fps, which
+	 * indicates an average of 100ms between the end of one tick and the end of the next. However, {{#crossLink "Ticker/getMeasuredTickTime"}}{{/crossLink}}
+	 * returns 20ms. This would indicate that something other than the tick is using ~80ms (another script, DOM
+	 * rendering, etc).
 	 * @method getMeasuredTickTime
 	 * @static
 	 * @param {Number} [ticks] The number of previous ticks over which to measure the average time spent in a tick.
@@ -1226,7 +1239,7 @@ createjs.indexOf = function (array, searchElement){
 		if (!times || times.length < 1) { return -1; }
 
 		// by default, calculate average for the past ~1 second:
-		ticks = Math.min(times.length, ticks||(Ticker.getFPS()|0));
+		ticks = Math.min(times.length, ticks||(Ticker._getFPS()|0));
 		for (var i=0; i<ticks; i++) { ttl += times[i]; }
 		return ttl/ticks;
 	};
@@ -1245,32 +1258,8 @@ createjs.indexOf = function (array, searchElement){
 		if (!times || times.length < 2) { return -1; }
 
 		// by default, calculate fps for the past ~1 second:
-		ticks = Math.min(times.length-1, ticks||(Ticker.getFPS()|0));
+		ticks = Math.min(times.length-1, ticks||(Ticker._getFPS()|0));
 		return 1000/((times[0]-times[ticks])/ticks);
-	};
-
-	/**
-	 * Use the {{#crossLink "Ticker/paused:property"}}{{/crossLink}} property instead.
-	 * @method setPaused
-	 * @static
-	 * @param {Boolean} value
-	 * @deprecated
-	 **/
-	Ticker.setPaused = function(value) {
-		// TODO: deprecated.
-		Ticker.paused = value;
-	};
-
-	/**
-	 * Use the {{#crossLink "Ticker/paused:property"}}{{/crossLink}} property instead.
-	 * @method getPaused
-	 * @static
-	 * @return {Boolean}
-	 * @deprecated
-	 **/
-	Ticker.getPaused = function() {
-		// TODO: deprecated.
-		return Ticker.paused;
 	};
 
 	/**
@@ -1318,7 +1307,7 @@ createjs.indexOf = function (array, searchElement){
 	/**
 	 * @method _handleSynch
 	 * @static
-	 * @protected
+	 * @private
 	 **/
 	Ticker._handleSynch = function() {
 		Ticker._timerId = null;
@@ -1333,7 +1322,7 @@ createjs.indexOf = function (array, searchElement){
 	/**
 	 * @method _handleRAF
 	 * @static
-	 * @protected
+	 * @private
 	 **/
 	Ticker._handleRAF = function() {
 		Ticker._timerId = null;
@@ -1344,7 +1333,7 @@ createjs.indexOf = function (array, searchElement){
 	/**
 	 * @method _handleTimeout
 	 * @static
-	 * @protected
+	 * @private
 	 **/
 	Ticker._handleTimeout = function() {
 		Ticker._timerId = null;
@@ -1355,12 +1344,12 @@ createjs.indexOf = function (array, searchElement){
 	/**
 	 * @method _setupTick
 	 * @static
-	 * @protected
+	 * @private
 	 **/
 	Ticker._setupTick = function() {
 		if (Ticker._timerId != null) { return; } // avoid duplicates
 
-		var mode = Ticker.timingMode||(Ticker.useRAF&&Ticker.RAF_SYNCHED);
+		var mode = Ticker.timingMode;
 		if (mode == Ticker.RAF_SYNCHED || mode == Ticker.RAF) {
 			var f = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
 			if (f) {
@@ -1376,7 +1365,7 @@ createjs.indexOf = function (array, searchElement){
 	/**
 	 * @method _tick
 	 * @static
-	 * @protected
+	 * @private
 	 **/
 	Ticker._tick = function() {
 		var paused = Ticker.paused;
@@ -1410,7 +1399,7 @@ createjs.indexOf = function (array, searchElement){
 	/**
 	 * @method _getTime
 	 * @static
-	 * @protected
+	 * @private
 	 **/
 	var w=window, now=w.performance.now || w.performance.mozNow || w.performance.msNow || w.performance.oNow || w.performance.webkitNow;
 	Ticker._getTime = function() {
@@ -1759,20 +1748,6 @@ createjs.indexOf = function (array, searchElement){
 		 **/
 	}
 	var p = Matrix2D.prototype;
-
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
 
 // constants:
 	/**
@@ -2397,20 +2372,6 @@ createjs.indexOf = function (array, searchElement){
 		 **/
 	}
 	var p = Point.prototype;
-
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
 	
 // public methods:
 	/** 
@@ -2516,20 +2477,6 @@ createjs.indexOf = function (array, searchElement){
 		 **/
 	}
 	var p = Rectangle.prototype;
-
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
 
 // public methods:
 	/** 
@@ -2802,29 +2749,16 @@ createjs.indexOf = function (array, searchElement){
 		}
 	}
 	var p = ButtonHelper.prototype;
-
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
 	
 // getter / setters:
 	/**
 	 * Use the {{#crossLink "ButtonHelper/enabled:property"}}{{/crossLink}} property instead.
 	 * @method setEnabled
-	 * @param {Boolean} value
-	 * @deprecated
+	 * @param {Boolean} value The enabled property to set the instance to.
+	 * @[rptected
+	 * @protected
 	 **/
-	p.setEnabled = function(value) { // TODO: deprecated.
+	p._setEnabled = function(value) {
 		if (value == this._enabled) { return; }
 		var o = this.target;
 		this._enabled = value;
@@ -2844,15 +2778,20 @@ createjs.indexOf = function (array, searchElement){
 			if (o.__reset) { o._reset = o.__reset; delete(o.__reset); }
 		}
 	};
+	// ButtonHelper.setEnabled is @deprecated. Remove for 1.1+
+	p.setEnabled = createjs.deprecate(p._setEnabled, "ButtonHelper.setEnabled");
+
 	/**
 	 * Use the {{#crossLink "ButtonHelper/enabled:property"}}{{/crossLink}} property instead.
 	 * @method getEnabled
+	 * @protected
 	 * @return {Boolean}
-	 * @deprecated
 	 **/
-	p.getEnabled = function() {
+	p._getEnabled = function() {
 		return this._enabled;
 	};
+	// ButtonHelper.getEnabled is @deprecated. Remove for 1.1+
+	p.getEnabled = createjs.deprecate(p._getEnabled, "ButtonHelper.getEnabled");
 
 	/**
 	 * Enables or disables the button functionality on the target.
@@ -2861,7 +2800,7 @@ createjs.indexOf = function (array, searchElement){
 	 **/
 	try {
 		Object.defineProperties(p, {
-			enabled: { get: p.getEnabled, set: p.setEnabled }
+			enabled: { get: p._getEnabled, set: p._setEnabled }
 		});
 	} catch (e) {} // TODO: use Log
 
@@ -2979,20 +2918,6 @@ createjs.indexOf = function (array, searchElement){
 		this.blur = blur||0;
 	}
 	var p = Shadow.prototype;
-
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
 
 // static public properties:
 	/**
@@ -3362,13 +3287,15 @@ createjs.indexOf = function (array, searchElement){
 // getter / setters:
 	/**
 	 * Use the {{#crossLink "SpriteSheet/animations:property"}}{{/crossLink}} property instead.
-	 * @method getAnimations
+	 * @method _getAnimations
+	 * @protected
 	 * @return {Array}
-	 * @deprecated
 	 **/
-	p.getAnimations = function() {
+	p._getAnimations = function() {
 		return this._animations.slice();
 	};
+	// SpriteSheet.getAnimations is @deprecated. Remove for 1.1+
+	p.getAnimations = createjs.deprecate(p._getAnimations, "SpriteSheet.getAnimations");
 
 	/**
 	 * Returns an array of all available animation names available on this sprite sheet as strings.
@@ -3378,7 +3305,7 @@ createjs.indexOf = function (array, searchElement){
 	 **/
 	try {
 		Object.defineProperties(p, {
-			animations: { get: p.getAnimations }
+			animations: { get: p._getAnimations }
 		});
 	} catch (e) {}
 
@@ -3598,7 +3525,7 @@ createjs.indexOf = function (array, searchElement){
 		
 		imgLoop:
 		for (var i=0, imgs=this._images; i<imgs.length; i++) {
-			var img = imgs[i], imgW = img.width, imgH = img.height;
+			var img = imgs[i], imgW = (img.width||img.naturalWidth), imgH = (img.height||img.naturalHeight);
 
 			var y = margin;
 			while (y <= imgH-margin-frameHeight) {
@@ -3843,20 +3770,6 @@ createjs.indexOf = function (array, searchElement){
 	var p = Graphics.prototype;
 	var G = Graphics; // shortcut
 
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
-
 // static public methods:
 	/**
 	 * Returns a CSS compatible color string based on the specified RGB numeric color values in the format
@@ -3987,14 +3900,16 @@ createjs.indexOf = function (array, searchElement){
 // getter / setters:
 	/**
 	 * Use the {{#crossLink "Graphics/instructions:property"}}{{/crossLink}} property instead.
-	 * @method getInstructions
-	 * @return {Array}
-	 * @deprecated
+	 * @method _getInstructions
+	 * @protected
+	 * @return {Array} The instructions array, useful for chaining
 	 **/
-	p.getInstructions = function() {
+	p._getInstructions = function() {
 		this._updateInstructions();
 		return this._instructions;
 	};
+	// Graphics.getInstructions is @deprecated. Remove for 1.1+
+	p.getInstructions = createjs.deprecate(p._getInstructions, "Graphics.getInstructions");
 
 	/**
 	 * Returns the graphics instructions array. Each entry is a graphics command object (ex. Graphics.Fill, Graphics.Rect)
@@ -4007,7 +3922,7 @@ createjs.indexOf = function (array, searchElement){
 	 **/
 	try {
 		Object.defineProperties(p, {
-			instructions: { get: p.getInstructions }
+			instructions: { get: p._getInstructions }
 		});
 	} catch (e) {}
 
@@ -4574,13 +4489,6 @@ createjs.indexOf = function (array, searchElement){
 	p.drawPolyStar = function(x, y, radius, sides, pointSize, angle) {
 		return this.append(new G.PolyStar(x, y, radius, sides, pointSize, angle));
 	};
-
-	// TODO: deprecated.
-	/**
-	 * Removed in favour of using custom command objects with {{#crossLink "Graphics/append"}}{{/crossLink}}.
-	 * @method inject
-	 * @deprecated
-	 **/
 
 	/**
 	 * Appends a graphics command object to the graphics queue. Command objects expose an "exec" method
@@ -6102,6 +6010,7 @@ createjs.indexOf = function (array, searchElement){
 		/**
 		 * The left offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate
 		 * around its center, you would set regX and {{#crossLink "DisplayObject/regY:property"}}{{/crossLink}} to 50.
+		 * Cached object's registration points should be set based on pre-cache conditions, not cached size.
 		 * @property regX
 		 * @type {Number}
 		 * @default 0
@@ -6111,6 +6020,7 @@ createjs.indexOf = function (array, searchElement){
 		/**
 		 * The y offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around
 		 * its center, you would set {{#crossLink "DisplayObject/regX:property"}}{{/crossLink}} and regY to 50.
+		 * Cached object's registration points should be set based on pre-cache conditions, not cached size.
 		 * @property regY
 		 * @type {Number}
 		 * @default 0
@@ -6269,54 +6179,8 @@ createjs.indexOf = function (array, searchElement){
 		 */
 		this.cursor = null;
 
-		/**
-		 * Returns an ID number that uniquely identifies the current cache for this display object. This can be used to
-		 * determine if the cache has changed since a previous check.
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property cacheID
-		 * @deprecated
-		 * @type {Number}
-		 * @default 0
-		 */
-
 
 	// private properties:
-		/**
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property _cacheOffsetX
-		 * @protected
-		 * @type {Number}
-		 * @default 0
-		 * @deprecated
-		 **/
-
-		/**
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property _cacheOffsetY
-		 * @protected
-		 * @type {Number}
-		 * @default 0
-		 * @deprecated
-		 **/
-
-		/**
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property _filterOffsetX
-		 * @protected
-		 * @type {Number}
-		 * @default 0
-		 * @deprecated
-		 **/
-
-		/**
-		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
-		 * @property _filterOffsetY
-		 * @protected
-		 * @type {Number}
-		 * @default 0
-		 * @deprecated
-		 **/
-
 		/**
 		 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
 		 * @property _cacheScale
@@ -6379,19 +6243,6 @@ createjs.indexOf = function (array, searchElement){
 		this._webGLRenderStyle = DisplayObject._StageGL_NONE;
 	}
 	var p = createjs.extend(DisplayObject, createjs.EventDispatcher);
-
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 
 // static properties:
 	/**
@@ -6604,17 +6455,19 @@ createjs.indexOf = function (array, searchElement){
 // getter / setters:
 	/**
 	 * Use the {{#crossLink "DisplayObject/stage:property"}}{{/crossLink}} property instead.
-	 * @method getStage
+	 * @method _getStage
+	 * @protected
 	 * @return {Stage}
-	 * @deprecated
 	 **/
-	p.getStage = function() {
+	p._getStage = function() {
 		// uses dynamic access to avoid circular dependencies;
 		var o = this, _Stage = createjs["Stage"];
 		while (o.parent) { o = o.parent; }
 		if (o instanceof _Stage) { return o; }
 		return null;
 	};
+	// DisplayObject.getStage is @deprecated. Remove for 1.1+
+	p.getStage = createjs.deprecate(p._getStage, "DisplayObject.getStage");
 
 	/**
 	 * Returns the Stage instance that this display object will be rendered on, or null if it has not been added to one.
@@ -6622,32 +6475,35 @@ createjs.indexOf = function (array, searchElement){
 	 * @type {Stage}
 	 * @readonly
 	 **/
+
+	/**
+	 * Returns an ID number that uniquely identifies the current cache for this display object. This can be used to
+	 * determine if the cache has changed since a previous check.
+	 * Moved to {{#crossLink "BitmapCache"}}{{/crossLink}}
+	 * @property cacheID
+	 * @deprecated
+	 * @type {Number}
+	 * @default 0
+	 */
+
+	/**
+	 * Set both the {{#crossLink "DisplayObject/scaleX:property"}}{{/crossLink}} and the {{#crossLink "DisplayObject/scaleY"}}{{/crossLink}}
+	 * property to the same value. Note that when you get the value, if the `scaleX` and `scaleY` are different values,
+	 * it will return only the `scaleX`.
+	 * @property scaleX
+	 * @type {Number}
+	 * @default 1
+	 */
 	try {
 		Object.defineProperties(p, {
-			stage: { get: p.getStage },
+			stage: { get: p._getStage },
 			cacheID: {
 				get: function(){ return this.bitmapCache && this.bitmapCache.cacheID },
 				set: function(a){ this.bitmapCache && (this.bitmapCache.cacheID = a) }
 			},
-			_cacheOffsetX: {
-				get: function(){ return this.bitmapCache && this.bitmapCache.x },
-				set: function(a){ this.bitmapCache && (this.bitmapCache.x = a) }
-			},
-			_cacheOffsetY: {
-				get: function(){ return this.bitmapCache && this.bitmapCache.y },
-				set: function(a){ this.bitmapCache && (this.bitmapCache.y = a) }
-			},
-			_filterOffsetX: {
-				get: function(){ return this.bitmapCache && this.bitmapCache.offX },
-				set: function(a){ this.bitmapCache && (this.bitmapCache.offX = a) }
-			},
-			_filterOffsetY: {
-				get: function(){ return this.bitmapCache && this.bitmapCache.offY },
-				set: function(a){ this.bitmapCache && (this.bitmapCache.offY = a) }
-			},
-			_cacheScale: {
-				get: function(){ return this.bitmapCache && this.bitmapCache.scale },
-				set: function(a){ this.bitmapCache && (this.bitmapCache.scale = a) }
+			scale: {
+				get: function() { return this.scaleX; },
+				set: function(scale) { this.scaleX = this.scaleY = scale; },
 			}
 		});
 	} catch (e) {}
@@ -7365,13 +7221,15 @@ createjs.indexOf = function (array, searchElement){
 // getter / setters:
 	/**
 	 * Use the {{#crossLink "Container/numChildren:property"}}{{/crossLink}} property instead.
-	 * @method getNumChildren
+	 * @method _getNumChildren
+	 * @protected
 	 * @return {Number}
-	 * @deprecated
 	 **/
-	p.getNumChildren = function() {
+	p._getNumChildren = function() {
 		return this.children.length;
 	};
+	// Container.getNumChildren is @deprecated. Remove for 1.1+
+	p.getNumChildren = createjs.deprecate(p._getNumChildren, "Container.getNumChildren");
 
 	/**
 	 * Returns the number of children in the container.
@@ -7381,7 +7239,7 @@ createjs.indexOf = function (array, searchElement){
 	 **/
 	try {
 		Object.defineProperties(p, {
-			numChildren: { get: p.getNumChildren }
+			numChildren: { get: p._getNumChildren }
 		});
 	} catch (e) {}
 	
@@ -8175,20 +8033,6 @@ createjs.indexOf = function (array, searchElement){
 		this.enableDOMEvents(true);
 	}
 	var p = createjs.extend(Stage, createjs.Container);
-
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
 
 // events:
 	/**
@@ -9365,56 +9209,58 @@ createjs.indexOf = function (array, searchElement){
 	 */
 	StageGL.UV_RECT = {t:0, l:0, b:1, r:1};
 
-	/**
-	 * Vertex positions for a card that covers the entire render. Used with render targets primarily.
-	 * @property COVER_VERT
-	 * @static
-	 * @final
-	 * @type {Float32Array}
-	 * @readonly
-	 */
-	StageGL.COVER_VERT = new Float32Array([
-		-1,		 1,		//TL
-		1,		 1,		//TR
-		-1,		-1,		//BL
-		1,		 1,		//TR
-		1,		-1,		//BR
-		-1,		-1		//BL
-	]);
+	try {
+		/**
+		 * Vertex positions for a card that covers the entire render. Used with render targets primarily.
+		 * @property COVER_VERT
+		 * @static
+		 * @final
+		 * @type {Float32Array}
+		 * @readonly
+		 */
+		StageGL.COVER_VERT = new Float32Array([
+			-1,		 1,		//TL
+			1,		 1,		//TR
+			-1,		-1,		//BL
+			1,		 1,		//TR
+			1,		-1,		//BR
+			-1,		-1		//BL
+		]);
 
-	/**
-	 * U/V for {{#crossLink "StageGL/COVER_VERT:property"}}{{/crossLink}}.
-	 * @property COVER_UV
-	 * @static
-	 * @final
-	 * @type {Float32Array}
-	 * @readonly
-	 */
-	StageGL.COVER_UV = new Float32Array([
-		 0,		 0,		//TL
-		 1,		 0,		//TR
-		 0,		 1,		//BL
-		 1,		 0,		//TR
-		 1,		 1,		//BR
-		 0,		 1		//BL
-	]);
+		/**
+		 * U/V for {{#crossLink "StageGL/COVER_VERT:property"}}{{/crossLink}}.
+		 * @property COVER_UV
+		 * @static
+		 * @final
+		 * @type {Float32Array}
+		 * @readonly
+		 */
+		StageGL.COVER_UV = new Float32Array([
+			 0,		 0,		//TL
+			 1,		 0,		//TR
+			 0,		 1,		//BL
+			 1,		 0,		//TR
+			 1,		 1,		//BR
+			 0,		 1		//BL
+		]);
 
-	/**
-	 * Flipped U/V for {{#crossLink "StageGL:COVER_VERT:property"}}{{/crossLink}}.
-	 * @property COVER_UV_FLIP
-	 * @static
-	 * @final
-	 * @type {Float32Array}
-	 * @readonly
-	 */
-	StageGL.COVER_UV_FLIP = new Float32Array([
-		 0,		 1,		//TL
-		 1,		 1,		//TR
-		 0,		 0,		//BL
-		 1,		 1,		//TR
-		 1,		 0,		//BR
-		 0,		 0		//BL
-	]);
+		/**
+		 * Flipped U/V for {{#crossLink "StageGL:COVER_VERT:property"}}{{/crossLink}}.
+		 * @property COVER_UV_FLIP
+		 * @static
+		 * @final
+		 * @type {Float32Array}
+		 * @readonly
+		 */
+		StageGL.COVER_UV_FLIP = new Float32Array([
+			 0,		 1,		//TL
+			 1,		 1,		//TR
+			 0,		 0,		//BL
+			 1,		 1,		//TR
+			 1,		 0,		//BR
+			 0,		 0		//BL
+		]);
+	} catch(e) { /* Breaking in older browsers, but those browsers wont run StageGL so no recovery or warning needed */ }
 
 	/**
 	 * Portion of the shader that contains the "varying" properties required in both vertex and fragment shaders. The
@@ -9509,7 +9355,17 @@ createjs.indexOf = function (array, searchElement){
 				"{{alternates}}" +
 			"}" +
 
-			"gl_FragColor = vec4(color.rgb{{premultiply}}, color.a * alphaValue);" +
+			"{{fragColor}}" +
+		"}"
+	);
+	StageGL.REGULAR_FRAG_COLOR_NORMAL = (
+		"gl_FragColor = vec4(color.rgb, color.a * alphaValue);"
+	);
+	StageGL.REGULAR_FRAG_COLOR_PREMULTIPLY = (
+		"if(color.a > 0.0035) {" +		// 1/255 = 0.0039, so ignore any value below 1 because it's probably noise
+			"gl_FragColor = vec4(color.rgb/color.a, color.a * alphaValue);" +
+		"} else {" +
+			"gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);" +
 		"}"
 	);
 
@@ -9759,9 +9615,7 @@ createjs.indexOf = function (array, searchElement){
 			this._webGLContext.clearColor(cc.r, cc.g, cc.b, cc.a);
 		} else {
 			// Use 2D.
-			var ctx = this.canvas.getContext("2d");
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
-			ctx.clearRect(0, 0, this.canvas.width + 1, this.canvas.height + 1);
+			this.Stage_clear();
 		}
 	};
 
@@ -10047,8 +9901,9 @@ createjs.indexOf = function (array, searchElement){
 
 		if (filter._builtShader) {
 			targetShader = filter._builtShader;
-			if (targetShader.shaderParamSetup) {
-				targetShader.shaderParamSetup(gl, this, targetShader);
+			if (filter.shaderParamSetup) {
+				gl.useProgram(targetShader);
+				filter.shaderParamSetup(gl, this, targetShader);
 			}
 		} else {
 			try {
@@ -10161,6 +10016,7 @@ createjs.indexOf = function (array, searchElement){
 	 */
 	p.setTextureParams = function (gl, isPOT) {
 		if (isPOT && this._antialias) {
+			//non POT linear works in some devices, but performance is NOT good, investigate
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		} else {
@@ -10397,7 +10253,7 @@ createjs.indexOf = function (array, searchElement){
 			insert += "} else if (indexPicker <= "+ i +".5) { color = texture2D(uSampler["+ i +"], vTextureCoord);";
 		}
 		str = str.replace(/{{alternates}}/g, insert);
-		str = str.replace(/{{premultiply}}/g, this._premultiply ? "/color.a" : "");
+		str = str.replace(/{{fragColor}}/g, this._premultiply ? StageGL.REGULAR_FRAG_COLOR_PREMULTIPLY : StageGL.REGULAR_FRAG_COLOR_NORMAL);
 
 		// actually compile the shader
 		var shader = gl.createShader(type);
@@ -10792,7 +10648,6 @@ createjs.indexOf = function (array, searchElement){
 		The internal complexity comes from reducing over-draw, shared code, and issues like textures needing to be flipped
 		sometimes when written to render textures.
 		*/
-		var gl = this._webGLContext;
 		var renderTexture;
 		var shaderBackup = this._activeShader;
 		var blackListBackup = this._slotBlacklist;
@@ -10807,18 +10662,15 @@ createjs.indexOf = function (array, searchElement){
 		mtx = mtx.clone();
 		mtx.scale(1/manager.scale, 1/manager.scale);
 		mtx = mtx.invert();
-		mtx.translate(-manager.offX/manager.scale, -manager.offY/manager.scale);
+		mtx.translate(-manager.offX/manager.scale*target.scaleX, -manager.offY/manager.scale*target.scaleY);
 		var container = this._cacheContainer;
 		container.children = [target];
 		container.transformMatrix = mtx;
 
 		this._backupBatchTextures(false);
 
-		var filterCount = filters && filters.length;
-		if (filterCount) {
-			//this._backupBatchTextures(false);
+		if (filters && filters.length) {
 			this._drawFilters(target, filters, manager);
-			//this._backupBatchTextures(true);
 		} else {
 			// is this for another stage or mine?
 			if (this.isCacheControlled) {
@@ -10826,7 +10678,6 @@ createjs.indexOf = function (array, searchElement){
 				gl.clear(gl.COLOR_BUFFER_BIT);
 				this._batchDraw(container, gl, true);
 			} else {
-				//this._backupBatchTextures(false);
 				gl.activeTexture(gl.TEXTURE0 + lastTextureSlot);
 				target.cacheCanvas = this.getTargetRenderTexture(target, manager._drawWidth, manager._drawHeight);
 				renderTexture = target.cacheCanvas;
@@ -10840,7 +10691,6 @@ createjs.indexOf = function (array, searchElement){
 
 				gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 				this.updateViewport(wBackup, hBackup);
-				//this._backupBatchTextures(true);
 			}
 		}
 
@@ -10865,7 +10715,7 @@ createjs.indexOf = function (array, searchElement){
 		var wBackup = this._viewportWidth, hBackup = this._viewportHeight;
 
 		var container = this._cacheContainer;
-		var filterCount = filters && filters.length;
+		var filterCount = filters.length;
 
 		// we don't know which texture slot we're dealing with previously and we need one out of the way
 		// once we're using that slot activate it so when we make and bind our RenderTexture it's safe there
@@ -10884,10 +10734,8 @@ createjs.indexOf = function (array, searchElement){
 		this.setTextureParams(gl);
 
 		var flipY = false;
-
-		// apply each filter in order, but remember to toggle used texture and render buffer
-		for (var i=0; i<filterCount; i++) {
-			var filter = filters[i];
+		var i = 0, filter = filters[i];
+		do { // this is safe because we wouldn't be in apply filters without a filter count of at least 1
 
 			// swap to correct shader
 			this._activeShader = this.getFilterShader(filter);
@@ -10909,10 +10757,14 @@ createjs.indexOf = function (array, searchElement){
 			this.setTextureParams(gl);
 
 			// use flipping to keep things upright, things already cancel out on a single filter
-			if (filterCount > 1) {
+			// this needs to be here as multiPass is not accurate to _this_ frame until after shader acquisition
+			if (filterCount > 1 || filters[0]._multiPass) {
 				flipY = !flipY;
 			}
-		}
+
+			// work through the multipass if it's there, otherwise move on
+			filter = filter._multiPass !== null ? filter._multiPass : filters[++i];
+		} while (filter);
 
 		// is this for another stage or mine
 		if (this.isCacheControlled) {
@@ -11019,6 +10871,7 @@ createjs.indexOf = function (array, searchElement){
 				image = (ignoreCache?false:item.cacheCanvas) || item.image;
 			} else if (item._webGLRenderStyle === 1) {											// SPRITE
 				frame = item.spriteSheet.getFrame(item.currentFrame);	//TODO: Faster way?
+				if (frame === null) { continue; }
 				image = frame.image;
 			} else {																			// MISC (DOM objects render themselves later)
 				continue;
@@ -11066,14 +10919,13 @@ createjs.indexOf = function (array, searchElement){
 					subR = src.width+subL;				subB = src.height+subT;
 				} else {
 					// calculate uvs
+					uvRect = StageGL.UV_RECT;
 					// calculate vertices
 					if (useCache) {
 						src = item.bitmapCache;
-						uvRect = StageGL.UV_RECT;
-						subL = src.x;					subT = src.y;
-						subR = src.width+subL;			subB = src.height+subT;
+						subL = src.x+(src._filterOffX/src.scale);	subT = src.y+(src._filterOffY/src.scale);
+						subR = (src._drawWidth/src.scale)+subL;		subB = (src._drawHeight/src.scale)+subT;
 					} else {
-						uvRect = StageGL.UV_RECT;
 						subL = 0;						subT = 0;
 						subR = image.width+subL;		subB = image.height+subT;
 					}
@@ -12479,19 +12331,6 @@ createjs.indexOf = function (array, searchElement){
 	}
 	var p = createjs.extend(BitmapText, createjs.Container);
 
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
 // static properties:
 	/**
 	 * BitmapText uses Sprite instances to draw text. To reduce the creation and destruction of instances (and thus garbage collection), it maintains
@@ -12928,6 +12767,13 @@ createjs.indexOf = function (array, searchElement){
 		 * @private
 		 */
 		this._rawPosition = -1; // TODO: evaluate using a ._reset Boolean prop instead of -1.
+		
+		/**
+		 * @property _bound_resolveState
+		 * @type Function
+		 * @private
+		 */
+		this._bound_resolveState = this._resolveState.bind(this);
 	
 	
 		/**
@@ -12999,53 +12845,56 @@ createjs.indexOf = function (array, searchElement){
 // getter / setters:
 	/**
 	 * Use the {{#crossLink "MovieClip/labels:property"}}{{/crossLink}} property instead.
-	 * @method getLabels
+	 * @method _getLabels
+	 * @protected
 	 * @return {Array}
-	 * @deprecated
 	 **/
-	p.getLabels = function() {
+	p._getLabels = function() {
 		return this.timeline.getLabels();
 	};
-	
+	// MovieClip.getLabels is @deprecated. Remove for 1.1+
+	p.getLabels = createjs.deprecate(p._getLabels, "MovieClip.getLabels");
+
 	/**
 	 * Use the {{#crossLink "MovieClip/currentLabel:property"}}{{/crossLink}} property instead.
-	 * @method getCurrentLabel
+	 * @method _getCurrentLabel
+	 * @protected
 	 * @return {String}
-	 * @deprecated
 	 **/
-	p.getCurrentLabel = function() {
+	p._getCurrentLabel = function() {
 		return this.timeline.currentLabel;
 	};
-	
+	// MovieClip.getCurrentLabel is @deprecated. Remove for 1.1+
+	p.getCurrentLabel = createjs.deprecate(p._getCurrentLabel, "MovieClip.getCurrentLabel");
+
 	/**
 	 * Use the {{#crossLink "MovieClip/duration:property"}}{{/crossLink}} property instead.
-	 * @method getDuration
-	 * @return {Number}
+	 * @method _getDuration
 	 * @protected
+	 * @return {Number}
 	 **/
-	p.getDuration = function() {
+	p._getDuration = function() {
 		return this.timeline.duration;
 	};
+	// MovieClip.getDuration is @deprecated. Remove for 1.1+
+	p.getDuration = createjs.deprecate(p._getDuration, "MovieClip.getDuration");
 
 	/**
 	 * Returns an array of objects with label and position (aka frame) properties, sorted by position.
-	 * Shortcut to TweenJS: Timeline.getLabels();
 	 * @property labels
 	 * @type {Array}
 	 * @readonly
 	 **/
 	
 	/**
-	 * Returns the name of the label on or immediately before the current frame. See TweenJS: Timeline.getCurrentLabel()
-	 * for more information.
+	 * Returns the name of the label on or immediately before the current frame.
 	 * @property currentLabel
 	 * @type {String}
 	 * @readonly
 	 **/
 	
 	/**
-	 * Returns the duration of this MovieClip in seconds or ticks. Identical to {{#crossLink "MovieClip/duration:property"}}{{/crossLink}}
-	 * and provided for Adobe Flash/Animate API compatibility.
+	 * Returns the duration of this MovieClip in seconds or ticks.
 	 * @property totalFrames
 	 * @type {Number}
 	 * @readonly
@@ -13059,10 +12908,10 @@ createjs.indexOf = function (array, searchElement){
 	 **/
 	try {
 		Object.defineProperties(p, {
-			labels: { get: p.getLabels },
-			currentLabel: { get: p.getCurrentLabel },
-			totalFrames: { get: p.getDuration },
-			duration: { get: p.getDuration }
+			labels: { get: p._getLabels },
+			currentLabel: { get: p._getCurrentLabel },
+			totalFrames: { get: p._getDuration },
+			duration: { get: p._getDuration }
 			// TODO: can we just proxy .currentFrame to tl.position as well? Ditto for .loop (or just remove entirely).
 		});
 	} catch (e) {}
@@ -13241,7 +13090,20 @@ createjs.indexOf = function (array, searchElement){
 		
 		// update timeline position, ignoring actions if this is a graphic.
 		tl.loop = this.loop; // TODO: should we maintain this on MovieClip, or just have it on timeline?
-		tl.setPosition(rawPosition, synced || !this.actionsEnabled, jump, this._resolveState.bind(this));
+		tl.setPosition(rawPosition, synced || !this.actionsEnabled, jump, this._bound_resolveState);
+	};
+	
+	/**
+	 * Renders position 0 without running actions or updating _rawPosition.
+	 * Primarily used by Animate CC to build out the first frame in the constructor of MC symbols.
+	 * NOTE: not tested when run after the MC advances past the first frame.
+	 * @method _renderFirstFrame
+	 * @protected
+	 **/
+	p._renderFirstFrame = function() {
+		var tl = this.timeline, pos = tl.rawPosition;
+		tl.setPosition(0, true, true, this._bound_resolveState);
+		tl.rawPosition = pos;
 	};
 	
 	/**
@@ -13258,7 +13120,7 @@ createjs.indexOf = function (array, searchElement){
 		var tweens = tl.tweens;
 		for (var i=0, l=tweens.length; i<l; i++) {
 			var tween = tweens[i],  target = tween.target;
-			if (target === this || tween.passive) { continue; } // TODO: this assumes the actions tween from Animate has `this` as the target. Likely a better approach.
+			if (target === this || tween.passive) { continue; } // TODO: this assumes the actions tween from Animate has `this` as the target. There's likely a better approach.
 			var offset = tween._stepPosition;
 
 			if (target instanceof createjs.DisplayObject) {
@@ -13455,36 +13317,6 @@ createjs.indexOf = function (array, searchElement){
 
 // public static methods:
 	/**
-	 * <b>This is an experimental method, and may be buggy. Please report issues.</b><br/><br/>
-	 * Extends the existing sprite sheet by flipping the original frames horizontally, vertically, or both,
-	 * and adding appropriate animation & frame data. The flipped animations will have a suffix added to their names
-	 * (_h, _v, _hv as appropriate). Make sure the sprite sheet images are fully loaded before using this method.
-	 * <br/><br/>
-	 * For example:<br/>
-	 * SpriteSheetUtils.addFlippedFrames(mySpriteSheet, true, true);
-	 * The above would add frames that are flipped horizontally AND frames that are flipped vertically.
-	 * <br/><br/>
-	 * Note that you can also flip any display object by setting its scaleX or scaleY to a negative value. On some
-	 * browsers (especially those without hardware accelerated canvas) this can result in slightly degraded performance,
-	 * which is why addFlippedFrames is available.
-	 * @method addFlippedFrames
-	 * @static
-	 * @param {SpriteSheet} spriteSheet
-	 * @param {Boolean} horizontal If true, horizontally flipped frames will be added.
-	 * @param {Boolean} vertical If true, vertically flipped frames will be added.
-	 * @param {Boolean} both If true, frames that are flipped both horizontally and vertically will be added.
-	 * @deprecated Modern browsers perform better when flipping via a transform (ex. scaleX=-1) rendering this obsolete.
-	 **/
-	SpriteSheetUtils.addFlippedFrames = function(spriteSheet, horizontal, vertical, both) {
-		if (!horizontal && !vertical && !both) { return; }
-
-		var count = 0;
-		if (horizontal) { SpriteSheetUtils._flip(spriteSheet,++count,true,false); }
-		if (vertical) { SpriteSheetUtils._flip(spriteSheet,++count,false,true); }
-		if (both) { SpriteSheetUtils._flip(spriteSheet,++count,true,true); }
-	};
-
-	/**
 	 * Returns a single frame of the specified sprite sheet as a new PNG image. An example of when this may be useful is
 	 * to use a spritesheet frame as the source for a bitmap fill.
 	 *
@@ -13517,33 +13349,13 @@ createjs.indexOf = function (array, searchElement){
 		return img;
 	};
 
-	/**
-	 * Merges the rgb channels of one image with the alpha channel of another. This can be used to combine a compressed
-	 * JPEG image containing color data with a PNG32 monochromatic image containing alpha data. With certain types of
-	 * images (those with detail that lend itself to JPEG compression) this can provide significant file size savings
-	 * versus a single RGBA PNG32. This method is very fast (generally on the order of 1-2 ms to run).
-	 * @method mergeAlpha
-	 * @static
-	 * @param {HTMLImageElement} rbgImage The image (or canvas) containing the RGB channels to use.
-	 * @param {HTMLImageElement} alphaImage The image (or canvas) containing the alpha channel to use.
-	 * @param {HTMLCanvasElement} canvas Optional. If specified, this canvas will be used and returned. If not, a new canvas will be created.
-	 * @return {HTMLCanvasElement} A canvas with the combined image data. This can be used as a source for Bitmap or SpriteSheet.
-	 * @deprecated Tools such as ImageAlpha generally provide better results. This will be moved to sandbox in the future.
-	*/
-	SpriteSheetUtils.mergeAlpha = function(rgbImage, alphaImage, canvas) {
-		if (!canvas) { canvas = createjs.createCanvas?createjs.createCanvas():document.createElement("canvas"); }
-		canvas.width = Math.max(alphaImage.width, rgbImage.width);
-		canvas.height = Math.max(alphaImage.height, rgbImage.height);
-		var ctx = canvas.getContext("2d");
-		ctx.save();
-		ctx.drawImage(rgbImage,0,0);
-		ctx.globalCompositeOperation = "destination-in";
-		ctx.drawImage(alphaImage,0,0);
-		ctx.restore();
-		return canvas;
-	};
+	// SpriteSheetUtils.addFlippedFrames is @deprecated. Remove for 1.1+
+	SpriteSheetUtils.addFlippedFrames = createjs.deprecate(null, "SpriteSheetUtils.addFlippedFrames");
 
+	// SpriteSheetUtils.addFlippedFrames is @deprecated. Remove for 1.1+
+	SpriteSheetUtils.mergeAlpha = createjs.deprecate(null, "SpriteSheetUtils.mergeAlpha");
 
+	
 // private static methods:
 	SpriteSheetUtils._flip = function(spriteSheet, count, h, v) {
 		var imgs = spriteSheet._images;
@@ -13562,8 +13374,8 @@ createjs.indexOf = function (array, searchElement){
 			var img = document.createElement("img");
 			img.src = canvas.toDataURL("image/png");
 			// work around a strange bug in Safari:
-			img.width = src.width;
-			img.height = src.height;
+			img.width = (src.width||src.naturalWidth);
+			img.height = (src.height||src.naturalHeight);
 			imgs.push(img);
 		}
 
@@ -13576,11 +13388,11 @@ createjs.indexOf = function (array, searchElement){
 
 			var frame = {image:img,rect:rect,regX:src.regX,regY:src.regY};
 			if (h) {
-				rect.x = img.width-rect.x-rect.width; // update rect
+				rect.x = (img.width||img.naturalWidth)-rect.x-rect.width; // update rect
 				frame.regX = rect.width-src.regX; // update registration point
 			}
 			if (v) {
-				rect.y = img.height-rect.y-rect.height;  // update rect
+				rect.y = (img.height||img.naturalHeight)-rect.y-rect.height;  // update rect
 				frame.regY = rect.height-src.regY; // update registration point
 			}
 			frames.push(frame);
@@ -13766,20 +13578,6 @@ createjs.indexOf = function (array, searchElement){
 		this._scale = 1;
 	}
 	var p = createjs.extend(SpriteSheetBuilder, createjs.EventDispatcher);
-
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
 
 // constants:
 	SpriteSheetBuilder.ERR_DIMENSIONS = "frame dimensions exceed max spritesheet dimensions";
@@ -14384,7 +14182,7 @@ createjs.indexOf = function (array, searchElement){
 			var str = "matrix(" + (mtx.a*n|0)/n +","+ (mtx.b*n|0)/n +","+ (mtx.c*n|0)/n +","+ (mtx.d*n|0)/n +","+ (mtx.tx+0.5|0);
 			style.transform = style.WebkitTransform = style.OTransform = style.msTransform = str +","+ (mtx.ty+0.5|0) +")";
 			style.MozTransform = str +"px,"+ (mtx.ty+0.5|0) +"px)";
-			if (!oldProps) { oldProps = this._oldProps = new createjs.DisplayProps(true, NaN); }
+			if (!oldProps) { oldProps = this._oldProps = new createjs.DisplayProps(true, null); }
 			oldProps.matrix.copy(mtx);
 		}
 		
@@ -14446,6 +14244,15 @@ createjs.indexOf = function (array, searchElement){
 		this.usesContext = false;
 
 		/**
+		 * Another filter that is required to act as part of this filter and created and managed under the hood.
+		 * @private
+		 * @property _multiPass
+		 * @type {Filter}
+		 * @default null
+		 */
+		this._multiPass = null;
+
+		/**
 		 * Pre-processed template shader code. It will be parsed before being fed in into the shader compiler.
 		 * This should be based upon StageGL.SHADER_VERTEX_BODY_REGULAR
 		 * @property VTX_SHADER
@@ -14466,20 +14273,6 @@ createjs.indexOf = function (array, searchElement){
 		this.FRAG_SHADER_BODY = null;
 	}
 	var p = Filter.prototype;
-
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
 
 // public methods:
 	/**
@@ -14730,19 +14523,6 @@ createjs.indexOf = function (array, searchElement){
 	var p = BitmapCache.prototype;
 
 	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 **/
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
-	/**
 	 * Returns the bounds that surround all applied filters, relies on each filter to describe how it changes bounds.
 	 * @method getFilterBounds
 	 * @param {DisplayObject} target The object to check the filter bounds for.
@@ -14754,7 +14534,7 @@ createjs.indexOf = function (array, searchElement){
 		if(!output){ output = new createjs.Rectangle(); }
 		var filters = target.filters;
 		var filterCount = filters && filters.length;
-		if (filterCount > 0) { return output; }
+		if (!!filterCount <= 0) { return output; }
 
 		for(var i=0; i<filterCount; i++) {
 			var f = filters[i];
@@ -14906,7 +14686,6 @@ createjs.indexOf = function (array, searchElement){
 			var stage = this.target.stage;
 			if (stage instanceof createjs.StageGL){
 				stage.releaseTexture(this.target.cacheCanvas);
-				this.target.cacheCanvas.remove();
 			}
 		}
 
@@ -14942,8 +14721,8 @@ createjs.indexOf = function (array, searchElement){
 	p.draw = function(ctx) {
 		if(!this.target) { return false; }
 		ctx.drawImage(this.target.cacheCanvas,
-			this.x + this._filterOffX,		this.y + this._filterOffY,
-			this.width,						this.height
+			this.x + (this._filterOffX/this.scale),		this.y + (this._filterOffY/this.scale),
+			this._drawWidth/this.scale,					this._drawHeight/this.scale
 		);
 		return true;
 	};
@@ -14973,13 +14752,18 @@ createjs.indexOf = function (array, searchElement){
 
 		// create it if it's missing
 		if (!this._webGLCache) {
-			if (this._options.useGL === "stage" && this.target.stage.isWebGL) {
+			if (this._options.useGL === "stage") {
+				if(!(this.target.stage && this.target.stage.isWebGL)){
+					var error = "Cannot use 'stage' for cache because the object's parent stage is ";
+					error += this.target.stage ? "non WebGL." : "not set, please addChild to the correct stage.";
+					throw error;
+				}
 				this.target.cacheCanvas = true; // will be replaced with RenderTexture, temporary positive value for old "isCached" checks
 				this._webGLCache = this.target.stage;
 
-			} else if(this._options.useGL === "new" || this._options.useGL === "stage") {
-				this.target.cacheCanvas = document.createElement("canvas");
-				this._webGLCache = new createjs.StageGL(this.target.cacheCanvas, {antialias: true, transparent: true});
+			} else if(this._options.useGL === "new") {
+				this.target.cacheCanvas = document.createElement("canvas"); // we can turn off autopurge because we wont be making textures here
+				this._webGLCache = new createjs.StageGL(this.target.cacheCanvas, {antialias: true, transparent: true, autoPurge: -1});
 				this._webGLCache.isCacheControlled = true;	// use this flag to control stage sizing and final output
 
 			} else if(this._options.useGL instanceof createjs.StageGL) {
@@ -14988,7 +14772,7 @@ createjs.indexOf = function (array, searchElement){
 				this._webGLCache.isCacheControlled = true;	// use this flag to control stage sizing and final output
 
 			} else {
-				throw "Invalid cache selection or invalid StageGL object used for cache param";
+				throw "Invalid option provided to useGL, expected ['stage', 'new', StageGL, undefined], got "+ this._options.useGL;
 			}
 		}
 
@@ -15020,7 +14804,6 @@ createjs.indexOf = function (array, searchElement){
 	 * @protected
 	 **/
 	p._drawToCache = function(compositeOperation) {
-
 		var surface = this.target.cacheCanvas;
 		var target = this.target;
 		var webGL = this._webGLCache;
@@ -15043,9 +14826,11 @@ createjs.indexOf = function (array, searchElement){
 
 			ctx.save();
 			ctx.globalCompositeOperation = compositeOperation;
-			ctx.setTransform(this.scale, 0, 0, this.scale, -this.offX, -this.offY);
+			ctx.setTransform(this.scale,0,0,this.scale, -this._filterOffX,-this._filterOffY);
+			ctx.translate(-this.x, -this.y);
 			target.draw(ctx, true);
 			ctx.restore();
+
 
 			if (target.filters && target.filters.length) {
 				this._applyFilters(ctx);
@@ -15060,17 +14845,15 @@ createjs.indexOf = function (array, searchElement){
 	 * @protected
 	 **/
 	p._applyFilters = function(ctx) {
-		var surface = this.target.cacheCanvas;
 		var filters = this.target.filters;
 
-		var w = surface.width;
-		var h = surface.height;
+		var w = this._drawWidth;
+		var h = this._drawHeight;
 
 		var data;
 
-		var l = filters.length;
-		for (var i=0; i<l; i++) {
-			var filter = filters[i];
+		var i = 0, filter = filters[i];
+		do { // this is safe because we wouldn't be in apply filters without a filter count of at least 1
 			if(filter.usesContext){
 				if(data) {
 					ctx.putImageData(data, 0,0);
@@ -15083,7 +14866,10 @@ createjs.indexOf = function (array, searchElement){
 				}
 				filter._applyFilter(data);
 			}
-		}
+
+			// work through the multipass if it's there, otherwise move on
+			filter = filter._multiPass !== null ? filter._multiPass : filters[++i];
+		} while (filter);
 
 		//done
 		if(data) {
@@ -15104,8 +14890,8 @@ createjs.indexOf = function (array, searchElement){
 
 // constructor:
 	/**
-	 * Applies a box blur to DisplayObjects. Note that this filter is fairly CPU intensive, particularly if the quality is
-	 * set higher than 1.
+	 * Applies a box blur to DisplayObjects in context 2D and a Gaussian blur in webgl. Note that this filter is fairly
+	 * intensive, particularly if the quality is set higher than 1.
 	 *
 	 * <h4>Example</h4>
 	 * This example creates a red circle, and then applies a 5 pixel blur to it. It uses the {{#crossLink "Filter/getBounds"}}{{/crossLink}}
@@ -15140,6 +14926,7 @@ createjs.indexOf = function (array, searchElement){
 		 **/
 		this._blurX = blurX;
 		this._blurXTable = [];
+		this._lastBlurX = null;
 
 		/**
 		 * Vertical blur radius in pixels
@@ -15149,6 +14936,7 @@ createjs.indexOf = function (array, searchElement){
 		 **/
 		this._blurY = blurY;
 		this._blurYTable = [];
+		this._lastBlurY = null;
 
 		/**
 		 * Number of blur iterations. For example, a value of 1 will produce a rough blur. A value of 2 will produce a
@@ -15158,6 +14946,7 @@ createjs.indexOf = function (array, searchElement){
 		 * @type Number
 		 **/
 		this._quality;
+		this._lastQuality = null;
 
 		/**
 		 * This is a template to generate the shader for {{#crossLink FRAG_SHADER_BODY}}{{/crossLink}}
@@ -15198,28 +14987,39 @@ createjs.indexOf = function (array, searchElement){
 	p.setBlurX = function(value) {
 		if(isNaN(value) || value < 0){ value = 0; }
 		this._blurX = value;
-		this._blurXTable = this._getTable(value * this._quality);
-		this._updateShader();
 	};
 	p.setBlurY = function(value) {
 		if(isNaN(value) || value < 0){ value = 0; }
 		this._blurY = value;
-		this._blurYTable = this._getTable(value * this._quality);
-		this._updateShader();
 	};
 	p.getQuality = function() { return this._quality; };
 	p.setQuality = function(value) {
-		this._quality = value;
-		this._blurXTable = this._getTable(this._blurX * this._quality);
-		this._blurYTable = this._getTable(this._blurY * this._quality);
-		this._updateShader();
+		if(isNaN(value) || value < 0){ value = 0; }
+		this._quality = value | 0;
 	};
+	p._getShader = function() {
+		var xChange = this._lastBlurX !== this._blurX;
+		var yChange = this._lastBlurY !== this._blurY;
+		var qChange = this._lastQuality !== this._quality;
+		if(xChange || yChange || qChange) {
+			if(xChange || qChange) { this._blurXTable = this._getTable(this._blurX * this._quality); }
+			if(yChange || qChange) { this._blurYTable = this._getTable(this._blurY * this._quality); }
+			this._updateShader();
+			this._lastBlurX = this._blurX;
+			this._lastBlurY = this._blurY;
+			this._lastQuality = this._quality;
+			return undefined; // force a rebuild
+		}
+		return this._compiledShader;
+	};
+	p._setShader = function() { this._compiledShader; };
 
 	try {
 		Object.defineProperties(p, {
 			blurX: { get: p.getBlurX, set: p.setBlurX },
 			blurY: { get: p.getBlurY, set: p.setBlurY },
-			quality: { get: p.getQuality, set: p.setQuality }
+			quality: { get: p.getQuality, set: p.setQuality },
+			_builtShader: { get: p._getShader, set: p._setShader}
 		});
 	} catch (e) { console.log(e); }
 
@@ -15301,7 +15101,7 @@ createjs.indexOf = function (array, searchElement){
 		var x = this.blurX|0, y = this.blurY| 0;
 		if(x <= 0 && y <= 0) { return rect; }
 		var q = Math.pow(this.quality, 0.2);
-		return (rect || new createjs.Rectangle()).pad(x*q+1,y*q+1,x*q+1,y*q+1);
+		return (rect || new createjs.Rectangle()).pad(y*q+1,x*q+1,y*q+1,x*q+1);
 	};
 
 	/** docced in super class **/
@@ -16017,20 +15817,6 @@ createjs.indexOf = function (array, searchElement){
 		this.setColor(brightness, contrast, saturation, hue);
 	}
 	var p = ColorMatrix.prototype;
-
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
 
 // constants:
 	/**
@@ -16782,7 +16568,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @type String
 	 * @static
 	 **/
-	s.buildDate = /*=date*/"Thu, 18 May 2017 18:26:11 GMT"; // injected by build process
+	s.buildDate = /*=date*/"Tue, 22 Aug 2017 12:38:23 GMT"; // injected by build process
 
 })();
 
@@ -16813,7 +16599,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @type {String}
 	 * @static
 	 **/
-	s.buildDate = /*=date*/"Thu, 18 May 2017 18:25:57 GMT"; // injected by build process
+	s.buildDate = /*=date*/"Tue, 22 Aug 2017 12:38:06 GMT"; // injected by build process
 
 })();
 
@@ -18583,14 +18369,14 @@ createjs.indexOf = function (array, searchElement){
 		this.data = null;
 
 		/**
-		 * The request method used for HTTP calls. Both {{#crossLink "AbstractLoader/GET:property"}}{{/crossLink}} or
-		 * {{#crossLink "AbstractLoader/POST:property"}}{{/crossLink}} request types are supported, and are defined as
+		 * The request method used for HTTP calls. Both {{#crossLink "Methods/GET:property"}}{{/crossLink}} or
+		 * {{#crossLink "Methods/POST:property"}}{{/crossLink}} request types are supported, and are defined as
 		 * constants on {{#crossLink "AbstractLoader"}}{{/crossLink}}.
 		 * @property method
 		 * @type {String}
 		 * @default GET
 		 */
-		this.method = createjs.LoadItem.GET;
+		this.method = createjs.Methods.GET;
 
 		/**
 		 * An object hash of name/value pairs to send to the server.
@@ -18731,8 +18517,8 @@ createjs.indexOf = function (array, searchElement){
 	 */
 	s.isBinary = function (type) {
 		switch (type) {
-			case createjs.AbstractLoader.IMAGE:
-			case createjs.AbstractLoader.BINARY:
+			case createjs.Types.IMAGE:
+			case createjs.Types.BINARY:
 				return true;
 			default:
 				return false;
@@ -18748,14 +18534,14 @@ createjs.indexOf = function (array, searchElement){
 	 */
 	s.isText = function (type) {
 		switch (type) {
-			case createjs.AbstractLoader.TEXT:
-			case createjs.AbstractLoader.JSON:
-			case createjs.AbstractLoader.MANIFEST:
-			case createjs.AbstractLoader.XML:
-			case createjs.AbstractLoader.CSS:
-			case createjs.AbstractLoader.SVG:
-			case createjs.AbstractLoader.JAVASCRIPT:
-			case createjs.AbstractLoader.SPRITESHEET:
+			case createjs.Types.TEXT:
+			case createjs.Types.JSON:
+			case createjs.Types.MANIFEST:
+			case createjs.Types.XML:
+			case createjs.Types.CSS:
+			case createjs.Types.SVG:
+			case createjs.Types.JAVASCRIPT:
+			case createjs.Types.SPRITESHEET:
 				return true;
 			default:
 				return false;
@@ -18767,13 +18553,13 @@ createjs.indexOf = function (array, searchElement){
 	 * if it is an unusual extension.
 	 * @method getTypeByExtension
 	 * @param {String} extension The file extension to use to determine the load type.
-	 * @return {String} The determined load type (for example, <code>AbstractLoader.IMAGE</code>). Will return `null` if
+	 * @return {String} The determined load type (for example, `createjs.Types.IMAGE`). Will return `null` if
 	 * the type can not be determined by the extension.
 	 * @static
 	 */
 	s.getTypeByExtension = function (extension) {
 		if (extension == null) {
-			return createjs.AbstractLoader.TEXT;
+			return createjs.Types.TEXT;
 		}
 
 		switch (extension.toLowerCase()) {
@@ -18783,27 +18569,27 @@ createjs.indexOf = function (array, searchElement){
 			case "png":
 			case "webp":
 			case "bmp":
-				return createjs.AbstractLoader.IMAGE;
+				return createjs.Types.IMAGE;
 			case "ogg":
 			case "mp3":
 			case "webm":
-				return createjs.AbstractLoader.SOUND;
+				return createjs.Types.SOUND;
 			case "mp4":
 			case "webm":
 			case "ts":
-				return createjs.AbstractLoader.VIDEO;
+				return createjs.Types.VIDEO;
 			case "json":
-				return createjs.AbstractLoader.JSON;
+				return createjs.Types.JSON;
 			case "xml":
-				return createjs.AbstractLoader.XML;
+				return createjs.Types.XML;
 			case "css":
-				return createjs.AbstractLoader.CSS;
+				return createjs.Types.CSS;
 			case "js":
-				return createjs.AbstractLoader.JAVASCRIPT;
+				return createjs.Types.JAVASCRIPT;
 			case 'svg':
-				return createjs.AbstractLoader.SVG;
+				return createjs.Types.SVG;
 			default:
-				return createjs.AbstractLoader.TEXT;
+				return createjs.Types.TEXT;
 		}
 	};
 
@@ -18975,194 +18761,29 @@ createjs.indexOf = function (array, searchElement){
 	var p = createjs.extend(AbstractLoader, createjs.EventDispatcher);
 	var s = AbstractLoader;
 
-	// TODO: deprecated
-	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
+	// Remove these @deprecated properties after 1.0
+	try {
+		Object.defineProperties(s, {
+			POST: { get: createjs.deprecate(function() { return createjs.Methods.POST; }, "AbstractLoader.POST") },
+			GET: { get: createjs.deprecate(function() { return createjs.Methods.GET; }, "AbstractLoader.GET") },
 
-
-	/**
-	 * Defines a POST request, use for a method value when loading data.
-	 * @property POST
-	 * @type {string}
-	 * @default post
-	 * @deprecated Use Methods.POST instead
-	 * @static
-	 */
-	s.POST = createjs.Methods.POST;
-
-	/**
-	 * Defines a GET request, use for a method value when loading data.
-	 * @property GET
-	 * @type {string}
-	 * @default get
-	 * @deprecated Use Methods.GET instead
-	 * @static
-	 */
-	s.GET = createjs.Methods.GET;
-
-	/**
-	 * The preload type for generic binary types. Note that images are loaded as binary files when using XHR.
-	 * @property BINARY
-	 * @type {String}
-	 * @default binary
-	 * @static
-	 * @deprecated Use createjs.Types.BINARY instead
-	 * @since 0.6.0
-	 */
-	s.BINARY = createjs.Types.BINARY;
-
-	/**
-	 * The preload type for css files. CSS files are loaded using a &lt;link&gt; when loaded with XHR, or a
-	 * &lt;style&gt; tag when loaded with tags.
-	 * @property CSS
-	 * @type {String}
-	 * @default css
-	 * @static
-	 * @deprecated Use createjs.Types.CSS instead
-	 * @since 0.6.0
-	 */
-	s.CSS = createjs.Types.CSS;
-
-	s.FONT = createjs.Types.FONT;
-	s.FONTCSS = createjs.Types.FONTCSS;
-
-	/**
-	 * The preload type for image files, usually png, gif, or jpg/jpeg. Images are loaded into an &lt;image&gt; tag.
-	 * @property IMAGE
-	 * @type {String}
-	 * @default image
-	 * @static
-	 * @deprecated Use createjs.Types.IMAGE instead
-	 * @since 0.6.0
-	 */
-	s.IMAGE = createjs.Types.IMAGE;
-
-	/**
-	 * The preload type for javascript files, usually with the "js" file extension. JavaScript files are loaded into a
-	 * &lt;script&gt; tag.
-	 *
-	 * Since version 0.4.1+, due to how tag-loaded scripts work, all JavaScript files are automatically injected into
-	 * the body of the document to maintain parity between XHR and tag-loaded scripts. In version 0.4.0 and earlier,
-	 * only tag-loaded scripts are injected.
-	 * @property JAVASCRIPT
-	 * @type {String}
-	 * @default javascript
-	 * @static
-	 * @deprecated Use createjs.Types.JAVASCRIPT instead
-	 * @since 0.6.0
-	 */
-	s.JAVASCRIPT = createjs.Types.JAVASCRIPT;
-
-	/**
-	 * The preload type for json files, usually with the "json" file extension. JSON data is loaded and parsed into a
-	 * JavaScript object. Note that if a `callback` is present on the load item, the file will be loaded with JSONP,
-	 * no matter what the {{#crossLink "LoadQueue/preferXHR:property"}}{{/crossLink}} property is set to, and the JSON
-	 * must contain a matching wrapper function.
-	 * @property JSON
-	 * @type {String}
-	 * @default json
-	 * @static
-	 * @deprecated Use createjs.Types.JSON instead
-	 * @since 0.6.0
-	 */
-	s.JSON = createjs.Types.JSON;
-
-	/**
-	 * The preload type for jsonp files, usually with the "json" file extension. JSON data is loaded and parsed into a
-	 * JavaScript object. You are required to pass a callback parameter that matches the function wrapper in the JSON.
-	 * Note that JSONP will always be used if there is a callback present, no matter what the {{#crossLink "LoadQueue/preferXHR:property"}}{{/crossLink}}
-	 * property is set to.
-	 * @property JSONP
-	 * @type {String}
-	 * @default jsonp
-	 * @static
-	 * @deprecated Use createjs.Types.JSONP instead
-	 * @since 0.6.0
-	 */
-	s.JSONP = createjs.Types.JSONP;
-
-	/**
-	 * The preload type for json-based manifest files, usually with the "json" file extension. The JSON data is loaded
-	 * and parsed into a JavaScript object. PreloadJS will then look for a "manifest" property in the JSON, which is an
-	 * Array of files to load, following the same format as the {{#crossLink "LoadQueue/loadManifest"}}{{/crossLink}}
-	 * method. If a "callback" is specified on the manifest object, then it will be loaded using JSONP instead,
-	 * regardless of what the {{#crossLink "LoadQueue/preferXHR:property"}}{{/crossLink}} property is set to.
-	 * @property MANIFEST
-	 * @type {String}
-	 * @default manifest
-	 * @static
-	 * @deprecated Use createjs.Types.MANIFEST instead
-	 * @since 0.6.0
-	 */
-	s.MANIFEST = "manifest";
-
-	/**
-	 * The preload type for sound files, usually mp3, ogg, or wav. When loading via tags, audio is loaded into an
-	 * &lt;audio&gt; tag.
-	 * @property SOUND
-	 * @type {String}
-	 * @default sound
-	 * @static
-	 * @deprecated Use createjs.Types.SOUND instead
-	 * @since 0.6.0
-	 */
-	s.SOUND = createjs.Types.SOUND;
-
-	/**
-	 * The preload type for video files, usually mp4, ts, or ogg. When loading via tags, video is loaded into an
-	 * &lt;video&gt; tag.
-	 * @property VIDEO
-	 * @type {String}
-	 * @default video
-	 * @static
-	 * @deprecated Use createjs.Types.VIDEO instead
-	 * @since 0.6.0
-	 */
-	s.VIDEO = createjs.Types.VIDEO;
-
-	/**
-	 * The preload type for SpriteSheet files. SpriteSheet files are JSON files that contain string image paths.
-	 * @property SPRITESHEET
-	 * @type {String}
-	 * @default spritesheet
-	 * @static
-	 * @deprecated Use createjs.Types.SPRITESHEET instead
-	 * @since 0.6.0
-	 */
-	s.SPRITESHEET = createjs.Types.SPRITESHEET;
-
-	/**
-	 * The preload type for SVG files.
-	 * @property SVG
-	 * @type {String}
-	 * @default svg
-	 * @static
-	 * @deprecated Use createjs.Types.SVG instead
-	 * @since 0.6.0
-	 */
-	s.SVG = createjs.Types.SVG;
-
-	/**
-	 * The preload type for text files, which is also the default file type if the type can not be determined. Text is
-	 * loaded as raw text.
-	 * @property TEXT
-	 * @type {String}
-	 * @default text
-	 * @static
-	 * @deprecated Use createjs.Types.TEXT instead
-	 * @since 0.6.0
-	 */
-	s.TEXT = createjs.Types.TEXT;
-
-	/**
-	 * The preload type for xml files. XML is loaded into an XML document.
-	 * @property XML
-	 * @type {String}
-	 * @default xml
-	 * @static
-	 * @deprecated Use createjs.Types.XML instead
-	 * @since 0.6.0
-	 */
-	s.XML = createjs.Types.XML;
+			BINARY: { get: createjs.deprecate(function() { return createjs.Types.BINARY; }, "AbstractLoader.BINARY") },
+			CSS: { get: createjs.deprecate(function() { return createjs.Types.CSS; }, "AbstractLoader.CSS") },
+			FONT: { get: createjs.deprecate(function() { return createjs.Types.FONT; }, "AbstractLoader.FONT") },
+			FONTCSS: { get: createjs.deprecate(function() { return createjs.Types.FONTCSS; }, "AbstractLoader.FONTCSS") },
+			IMAGE: { get: createjs.deprecate(function() { return createjs.Types.IMAGE; }, "AbstractLoader.IMAGE") },
+			JAVASCRIPT: { get: createjs.deprecate(function() { return createjs.Types.JAVASCRIPT; }, "AbstractLoader.JAVASCRIPT") },
+			JSON: { get: createjs.deprecate(function() { return createjs.Types.JSON; }, "AbstractLoader.JSON") },
+			JSONP: { get: createjs.deprecate(function() { return createjs.Types.JSONP; }, "AbstractLoader.JSONP") },
+			MANIFEST: { get: createjs.deprecate(function() { return createjs.Types.MANIFEST; }, "AbstractLoader.MANIFEST") },
+			SOUND: { get: createjs.deprecate(function() { return createjs.Types.SOUND; }, "AbstractLoader.SOUND") },
+			VIDEO: { get: createjs.deprecate(function() { return createjs.Types.VIDEO; }, "AbstractLoader.VIDEO") },
+			SPRITESHEET: { get: createjs.deprecate(function() { return createjs.Types.SPRITESHEET; }, "AbstractLoader.SPRITESHEET") },
+			SVG: { get: createjs.deprecate(function() { return createjs.Types.SVG; }, "AbstractLoader.SVG") },
+			TEXT: { get: createjs.deprecate(function() { return createjs.Types.TEXT; }, "AbstractLoader.TEXT") },
+			XML: { get: createjs.deprecate(function() { return createjs.Types.XML; }, "AbstractLoader.XML") }
+		});
+	} catch (e) {}
 
 // Events
 	/**
@@ -19484,11 +19105,13 @@ createjs.indexOf = function (array, searchElement){
 			case "complete":
 				this._rawResult = event.target._response;
 				var result = this.resultFormatter && this.resultFormatter(this);
+				// The resultFormatter is asynchronous
 				if (result instanceof Function) {
 					result.call(this,
 							createjs.proxy(this._resultFormatSuccess, this),
 							createjs.proxy(this._resultFormatFailed, this)
 					);
+				// The result formatter is synchronous
 				} else {
 					this._result =  result || this._rawResult;
 					this._sendComplete();
@@ -19533,16 +19156,6 @@ createjs.indexOf = function (array, searchElement){
 	 */
 	p._resultFormatFailed = function (event) {
 		this._sendError(event);
-	};
-
-	/**
-	 * @method buildPath
-	 * @protected
-	 * @deprecated Use the {{#crossLink "URLUtils"}}{{/crossLink}} method {{#crossLink "URLUtils/buildURI"}}{{/crossLink}}
-	 * instead.
-	 */
-	p.buildPath = function (src, data) {
-		return createjs.URLUtils.buildURI(src, data);
 	};
 
 	/**
@@ -20255,6 +19868,9 @@ createjs.indexOf = function (array, searchElement){
 	/**
 	 * The XHR request has completed. This is called by the XHR request directly, or by a readyStateChange that has
 	 * <code>request.readyState == 4</code>. Only the first call to this method will be processed.
+	 *
+	 * Note that This method uses {{#crossLink "_checkError"}}{{/crossLink}} to determine if the server has returned an
+	 * error code.
 	 * @method _handleLoad
 	 * @param {Object} event The XHR load event.
 	 * @private
@@ -20306,16 +19922,25 @@ createjs.indexOf = function (array, searchElement){
 
 // Protected
 	/**
-	 * Determine if there is an error in the current load. This checks the status of the request for problem codes. Note
-	 * that this does not check for an actual response. Currently, it only checks for error codes between 400 and 599
+	 * Determine if there is an error in the current load.
+	 * Currently this checks the status of the request for problem codes, and not actual response content:
+	 * <ul>
+	 *     <li>Status codes between 400 and 599 (HTTP error range)</li>
+	 *     <li>A status of 0, but *only when the application is running on a server*. If the application is running
+	 *     on `file:`, then it may incorrectly treat an error on local (or embedded applications) as a successful
+	 *     load.</li>
+	 * </ul>
 	 * @method _checkError
-	 * @return {int} If the request status returns an error code.
+	 * @return {Error} An error with the status code in the `message` argument.
 	 * @private
 	 */
 	p._checkError = function () {
 		var status = parseInt(this._request.status);
 		if (status >= 400 && status <= 599) {
 			return new Error(status);
+		} else if (status == 0) {
+			if ((/^https?:/).test(location.protocol)) { return new Error(0); }
+			return null; // Likely an embedded app.
 		} else {
 			return null;
 		}
@@ -20410,21 +20035,21 @@ createjs.indexOf = function (array, searchElement){
 		this._xhrLevel = (typeof req.responseType === "string") ? 2 : 1;
 
 		var src = null;
-		if (item.method == createjs.AbstractLoader.GET) {
+		if (item.method == createjs.Methods.GET) {
 			src = createjs.URLUtils.buildURI(item.src, item.values);
 		} else {
 			src = item.src;
 		}
 
 		// Open the request.  Set cross-domain flags if it is supported (XHR level 1 only)
-		req.open(item.method || createjs.AbstractLoader.GET, src, true);
+		req.open(item.method || createjs.Methods.GET, src, true);
 
 		if (crossdomain && req instanceof XMLHttpRequest && this._xhrLevel == 1) {
 			headers["Origin"] = location.origin;
 		}
 
 		// To send data we need to set the Content-type header)
-		if (item.values && item.method == createjs.AbstractLoader.POST) {
+		if (item.values && item.method == createjs.Methods.POST) {
 			headers["Content-Type"] = "application/x-www-form-urlencoded";
 		}
 
@@ -20560,33 +20185,31 @@ createjs.indexOf = function (array, searchElement){
 	 * either a non-standard file extension, or are serving the file using a proxy script, then you can pass in a
 	 * <code>type</code> property with any manifest item.
 	 *
-	 *      queue.loadFile({src:"path/to/myFile.mp3x", type:createjs.AbstractLoader.SOUND});
+	 *      queue.loadFile({src:"path/to/myFile.mp3x", type:createjs.Types.SOUND});
 	 *
 	 *      // Note that PreloadJS will not read a file extension from the query string
-	 *      queue.loadFile({src:"http://server.com/proxy?file=image.jpg", type:createjs.AbstractLoader.IMAGE});
+	 *      queue.loadFile({src:"http://server.com/proxy?file=image.jpg", type:createjs.Types.IMAGE});
 	 *
 	 * Supported types are defined on the {{#crossLink "AbstractLoader"}}{{/crossLink}} class, and include:
 	 * <ul>
-	 *     <li>{{#crossLink "AbstractLoader/BINARY:property"}}{{/crossLink}}: Raw binary data via XHR</li>
-	 *     <li>{{#crossLink "AbstractLoader/CSS:property"}}{{/crossLink}}: CSS files</li>
-	 *     <li>{{#crossLink "AbstractLoader/IMAGE:property"}}{{/crossLink}}: Common image formats</li>
-	 *     <li>{{#crossLink "AbstractLoader/JAVASCRIPT:property"}}{{/crossLink}}: JavaScript files</li>
-	 *     <li>{{#crossLink "AbstractLoader/JSON:property"}}{{/crossLink}}: JSON data</li>
-	 *     <li>{{#crossLink "AbstractLoader/JSONP:property"}}{{/crossLink}}: JSON files cross-domain</li>
-	 *     <li>{{#crossLink "AbstractLoader/MANIFEST:property"}}{{/crossLink}}: A list of files to load in JSON format, see
+	 *     <li>{{#crossLink "Types/BINARY:property"}}{{/crossLink}}: Raw binary data via XHR</li>
+	 *     <li>{{#crossLink "Types/CSS:property"}}{{/crossLink}}: CSS files</li>
+	 *     <li>{{#crossLink "Types/IMAGE:property"}}{{/crossLink}}: Common image formats</li>
+	 *     <li>{{#crossLink "Types/JAVASCRIPT:property"}}{{/crossLink}}: JavaScript files</li>
+	 *     <li>{{#crossLink "Types/JSON:property"}}{{/crossLink}}: JSON data</li>
+	 *     <li>{{#crossLink "Types/JSONP:property"}}{{/crossLink}}: JSON files cross-domain</li>
+	 *     <li>{{#crossLink "Types/MANIFEST:property"}}{{/crossLink}}: A list of files to load in JSON format, see
 	 *     {{#crossLink "AbstractLoader/loadManifest"}}{{/crossLink}}</li>
-	 *     <li>{{#crossLink "AbstractLoader/SOUND:property"}}{{/crossLink}}: Audio file formats</li>
-	 *     <li>{{#crossLink "AbstractLoader/SPRITESHEET:property"}}{{/crossLink}}: JSON SpriteSheet definitions. This
+	 *     <li>{{#crossLink "Types/SOUND:property"}}{{/crossLink}}: Audio file formats</li>
+	 *     <li>{{#crossLink "Types/SPRITESHEET:property"}}{{/crossLink}}: JSON SpriteSheet definitions. This
 	 *     will also load sub-images, and provide a {{#crossLink "SpriteSheet"}}{{/crossLink}} instance.</li>
-	 *     <li>{{#crossLink "AbstractLoader/SVG:property"}}{{/crossLink}}: SVG files</li>
-	 *     <li>{{#crossLink "AbstractLoader/TEXT:property"}}{{/crossLink}}: Text files - XHR only</li>
-     *     <li>{{#crossLink "AbstractLoader/VIDEO:property"}}{{/crossLink}}: Video objects</li>
-	 *     <li>{{#crossLink "AbstractLoader/XML:property"}}{{/crossLink}}: XML data</li>
+	 *     <li>{{#crossLink "Types/SVG:property"}}{{/crossLink}}: SVG files</li>
+	 *     <li>{{#crossLink "Types/TEXT:property"}}{{/crossLink}}: Text files - XHR only</li>
+     *     <li>{{#crossLink "Types/VIDEO:property"}}{{/crossLink}}: Video objects</li>
+	 *     <li>{{#crossLink "Types/XML:property"}}{{/crossLink}}: XML data</li>
 	 * </ul>
 	 *
-	 * <em>Note: Loader types used to be defined on LoadQueue, but have been moved to AbstractLoader for better
-	 * portability of loader classes, which can be used individually now. The properties on LoadQueue still exist, but
-	 * are deprecated.</em>
+	 * <em>Note: Loader types used to be defined on LoadQueue, but have been moved to the Types class</em>
 	 *
 	 * <b>Handling Results</b><br />
 	 * When a file is finished downloading, a {{#crossLink "LoadQueue/fileload:event"}}{{/crossLink}} event is
@@ -20612,7 +20235,7 @@ createjs.indexOf = function (array, searchElement){
 	 *          var type = item.type;
 	 *
 	 *          // Add any images to the page body.
-	 *          if (type == createjs.LoadQueue.IMAGE) {
+	 *          if (type == createjs.Types.IMAGE) {
 	 *              document.body.appendChild(event.result);
 	 *          }
 	 *      }
@@ -20808,18 +20431,29 @@ createjs.indexOf = function (array, searchElement){
 	var p = createjs.extend(LoadQueue, createjs.AbstractLoader);
 	var s = LoadQueue;
 
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
+	// Remove these @deprecated properties after 1.0
+	try {
+		Object.defineProperties(s, {
+			POST: { get: createjs.deprecate(function() { return createjs.Methods.POST; }, "AbstractLoader.POST") },
+			GET: { get: createjs.deprecate(function() { return createjs.Methods.GET; }, "AbstractLoader.GET") },
+
+			BINARY: { get: createjs.deprecate(function() { return createjs.Types.BINARY; }, "AbstractLoader.BINARY") },
+			CSS: { get: createjs.deprecate(function() { return createjs.Types.CSS; }, "AbstractLoader.CSS") },
+			FONT: { get: createjs.deprecate(function() { return createjs.Types.FONT; }, "AbstractLoader.FONT") },
+			FONTCSS: { get: createjs.deprecate(function() { return createjs.Types.FONTCSS; }, "AbstractLoader.FONTCSS") },
+			IMAGE: { get: createjs.deprecate(function() { return createjs.Types.IMAGE; }, "AbstractLoader.IMAGE") },
+			JAVASCRIPT: { get: createjs.deprecate(function() { return createjs.Types.JAVASCRIPT; }, "AbstractLoader.JAVASCRIPT") },
+			JSON: { get: createjs.deprecate(function() { return createjs.Types.JSON; }, "AbstractLoader.JSON") },
+			JSONP: { get: createjs.deprecate(function() { return createjs.Types.JSONP; }, "AbstractLoader.JSONP") },
+			MANIFEST: { get: createjs.deprecate(function() { return createjs.Types.MANIFEST; }, "AbstractLoader.MANIFEST") },
+			SOUND: { get: createjs.deprecate(function() { return createjs.Types.SOUND; }, "AbstractLoader.SOUND") },
+			VIDEO: { get: createjs.deprecate(function() { return createjs.Types.VIDEO; }, "AbstractLoader.VIDEO") },
+			SPRITESHEET: { get: createjs.deprecate(function() { return createjs.Types.SPRITESHEET; }, "AbstractLoader.SPRITESHEET") },
+			SVG: { get: createjs.deprecate(function() { return createjs.Types.SVG; }, "AbstractLoader.SVG") },
+			TEXT: { get: createjs.deprecate(function() { return createjs.Types.TEXT; }, "AbstractLoader.TEXT") },
+			XML: { get: createjs.deprecate(function() { return createjs.Types.XML; }, "AbstractLoader.XML") }
+		});
+	} catch (e) {}
 
 	/**
 	 * An internal initialization method, which is used for initial set up, but also to reset the LoadQueue.
@@ -20832,14 +20466,6 @@ createjs.indexOf = function (array, searchElement){
 	p.init = function (preferXHR, basePath, crossOrigin) {
 
 		// public properties
-		/**
-		 * @property useXHR
-		 * @type {Boolean}
-		 * @readonly
-		 * @default true
-		 * @deprecated Use preferXHR instead.
-		 */
-		this.useXHR = true;
 
 		/**
 		 * Try and use XMLHttpRequest (XHR) when possible. Note that LoadQueue will default to tag loading or XHR
@@ -21017,168 +20643,6 @@ createjs.indexOf = function (array, searchElement){
 	};
 
 // static properties
-	/**
-	 * The time in milliseconds to assume a load has failed. An {{#crossLink "AbstractLoader/error:event"}}{{/crossLink}}
-	 * event is dispatched if the timeout is reached before any data is received.
-	 * @property loadTimeout
-	 * @type {Number}
-	 * @default 8000
-	 * @static
-	 * @since 0.4.1
-	 * @deprecated In favour of the LoadItem.LOAD_TIMEOUT_DEFAULT property.
-	 */
-	s.loadTimeout = 8000;
-
-	/**
-	 * The time in milliseconds to assume a load has failed.
-	 * @property LOAD_TIMEOUT
-	 * @type {Number}
-	 * @default 0
-	 * @deprecated in favor of the LoadQueue.loadTimeout property.
-	 */
-	s.LOAD_TIMEOUT = 0;
-
-// Preload Types
-	/**
-	 * @property BINARY
-	 * @type {String}
-	 * @default binary
-	 * @static
-	 * @deprecated Use the AbstractLoader.BINARY property instead.
-	 */
-	s.BINARY = createjs.AbstractLoader.BINARY;
-
-	/**
-	 * @property CSS
-	 * @type {String}
-	 * @default css
-	 * @static
-	 * @deprecated Use the AbstractLoader.CSS property instead.
-	 */
-	s.CSS = createjs.AbstractLoader.CSS;
-
-    /**
-     * @property FONT
-     * @type {String}
-     * @default font
-     * @static
-     * @deprecated Use the AbstractLoader {{#crossLink "AbstractLoader/FONT:property"}}{{/crossLink}} instead.
-     */
-    s.FONT = createjs.AbstractLoader.FONT;
-
-    /**
-     * @property FONTCSS
-     * @type {String}
-     * @default fontcss
-     * @static
-     * @deprecated Use the AbstractLoader {{#crossLink "AbstractLoader/FONTCDD:property"}}{{/crossLink}} instead.
-     */
-    s.FONTCSS = createjs.AbstractLoader.FONTCSS;
-
-	/**
-	 * @property IMAGE
-	 * @type {String}
-	 * @default image
-	 * @static
-	 * @deprecated Use the AbstractLoader.IMAGE property instead.
-	 */
-	s.IMAGE = createjs.AbstractLoader.IMAGE;
-
-	/**
-	 * @property JAVASCRIPT
-	 * @type {String}
-	 * @default javascript
-	 * @static
-	 * @deprecated Use the AbstractLoader.JAVASCRIPT property instead.
-	 */
-	s.JAVASCRIPT = createjs.AbstractLoader.JAVASCRIPT;
-
-	/**
-	 * @property JSON
-	 * @type {String}
-	 * @default json
-	 * @static
-	 * @deprecated Use the AbstractLoader.JSON property instead.
-	 */
-	s.JSON = createjs.AbstractLoader.JSON;
-
-	/**
-	 * @property JSONP
-	 * @type {String}
-	 * @default jsonp
-	 * @static
-	 * @deprecated Use the AbstractLoader.JSONP property instead.
-	 */
-	s.JSONP = createjs.AbstractLoader.JSONP;
-
-	/**
-	 * @property MANIFEST
-	 * @type {String}
-	 * @default manifest
-	 * @static
-	 * @since 0.4.1
-	 * @deprecated Use the AbstractLoader.MANIFEST property instead.
-	 */
-	s.MANIFEST = createjs.AbstractLoader.MANIFEST;
-
-	/**
-	 * @property SOUND
-	 * @type {String}
-	 * @default sound
-	 * @static
-	 * @deprecated Use the AbstractLoader.SOUND property instead.
-	 */
-	s.SOUND = createjs.AbstractLoader.SOUND;
-
-	/**
-	 * @property VIDEO
-	 * @type {String}
-	 * @default video
-	 * @static
-	 * @deprecated Use the AbstractLoader.VIDEO instead.
-	 */
-	s.VIDEO = createjs.AbstractLoader.VIDEO;
-
-	/**
-	 * @property SVG
-	 * @type {String}
-	 * @default svg
-	 * @static
-	 * @deprecated Use the AbstractLoader.SVG property instead.
-	 */
-	s.SVG = createjs.AbstractLoader.SVG;
-
-	/**
-	 * @property TEXT
-	 * @type {String}
-	 * @default text
-	 * @static
-	 * @deprecated Use the AbstractLoader.TEXT instead.
-	 */
-	s.TEXT = createjs.AbstractLoader.TEXT;
-
-	/**
-	 * @property XML
-	 * @type {String}
-	 * @default xml
-	 * @static
-	 * @deprecated Use the AbstractLoader.XML instead.
-	 */
-	s.XML = createjs.AbstractLoader.XML;
-
-	/**
-	 * @property POST
-	 * @type {string}
-	 * @deprecated Use the AbstractLoader.POST property instead.
-	 */
-	s.POST = createjs.AbstractLoader.POST;
-
-	/**
-	 * @property GET
-	 * @type {string}
-	 * @deprecated Use the AbstractLoader.GET property instead.
-	 */
-	s.GET = createjs.AbstractLoader.GET;
 
 // events
 	/**
@@ -21248,19 +20712,6 @@ createjs.indexOf = function (array, searchElement){
 		if (idx != -1 && idx < this._defaultLoaderLength - 1) {
 			this._availableLoaders.splice(idx, 1);
 		}
-	};
-
-	/**
-	 * @method setUseXHR
-	 * @param {Boolean} value The new useXHR value to set.
-	 * @return {Boolean} The new useXHR value. If XHR is not supported by the browser, this will return false, even if
-	 * the provided value argument was true.
-	 * @since 0.3.0
-	 * @deprecated use the {{#crossLink "LoadQueue/preferXHR:property"}}{{/crossLink}} property, or the
-	 * {{#crossLink "LoadQueue/setUseXHR"}}{{/crossLink}} method instead.
-	 */
-	p.setUseXHR = function (value) {
-		return this.setPreferXHR(value);
 	};
 
 	/**
@@ -21479,7 +20930,7 @@ createjs.indexOf = function (array, searchElement){
 	 * value is true. If the queue is paused using {{#crossLink "LoadQueue/setPaused"}}{{/crossLink}}, and the value is
 	 * `true`, the queue will resume automatically.
 	 * @param {String} [basePath] A base path that will be prepended to each file. The basePath argument overrides the
-	 * path specified in the constructor. Note that if you load a manifest using a file of type {{#crossLink "AbstractLoader/MANIFEST:property"}}{{/crossLink}},
+	 * path specified in the constructor. Note that if you load a manifest using a file of type {{#crossLink "Types/MANIFEST:property"}}{{/crossLink}},
 	 * its files will <strong>NOT</strong> use the basePath parameter. <strong>The basePath parameter is deprecated.</strong>
 	 * This parameter will be removed in a future version. Please either use the `basePath` parameter in the LoadQueue
 	 * constructor, or a `path` property in a manifest definition.
@@ -21755,7 +21206,7 @@ createjs.indexOf = function (array, searchElement){
 
 			// Only worry about script order when using XHR to load scripts. Tags are only loading one at a time.
 			if ((this.maintainScriptOrder
-					&& item.type == createjs.LoadQueue.JAVASCRIPT
+					&& item.type == createjs.Types.JAVASCRIPT
 						//&& loader instanceof createjs.XHRLoader //NOTE: Have to track all JS files this way
 					)
 					|| item.maintainOrder === true) {
@@ -22098,7 +21549,7 @@ createjs.indexOf = function (array, searchElement){
 	p._finishOrderedItem = function (loader, loadFailed) {
 		var item = loader.getItem();
 
-		if ((this.maintainScriptOrder && item.type == createjs.LoadQueue.JAVASCRIPT)
+		if ((this.maintainScriptOrder && item.type == createjs.Types.JAVASCRIPT)
 				|| item.maintainOrder) {
 
 			//TODO: Evaluate removal of the _currentlyLoadingScript
@@ -22141,7 +21592,7 @@ createjs.indexOf = function (array, searchElement){
 			} // This has completed, and been processed. Move on.
 
 			var loadItem = this._loadedResults[item.id];
-			if (item.type == createjs.LoadQueue.JAVASCRIPT) {
+			if (item.type == createjs.Types.JAVASCRIPT) {
 				// Append script tags to the head automatically.
 				createjs.DomUtils.appendToHead(loadItem);
 			}
@@ -22165,7 +21616,7 @@ createjs.indexOf = function (array, searchElement){
 
 		// Since LoadQueue needs maintain order, we can't append scripts in the loader.
 		// So we do it here instead. Or in _checkScriptLoadOrder();
-		if (!this.maintainScriptOrder && item.type == createjs.LoadQueue.JAVASCRIPT) {
+		if (!this.maintainScriptOrder && item.type == createjs.Types.JAVASCRIPT) {
 			var tag = loader.getTag();
 			createjs.DomUtils.appendToHead(tag);
 		}
@@ -22189,7 +21640,7 @@ createjs.indexOf = function (array, searchElement){
 			return true;
 		}
 		var item = loader.getItem();
-		if (item.type != createjs.LoadQueue.JAVASCRIPT) {
+		if (item.type != createjs.Types.JAVASCRIPT) {
 			return true;
 		}
 		if (this._currentlyLoadingScript) {
@@ -22385,7 +21836,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @constructor
 	 */
 	function TextLoader(loadItem) {
-		this.AbstractLoader_constructor(loadItem, true, createjs.AbstractLoader.TEXT);
+		this.AbstractLoader_constructor(loadItem, true, createjs.Types.TEXT);
 	};
 
 	var p = createjs.extend(TextLoader, createjs.AbstractLoader);
@@ -22393,7 +21844,7 @@ createjs.indexOf = function (array, searchElement){
 
 	// static methods
 	/**
-	 * Determines if the loader can load a specific item. This loader loads items that are of type {{#crossLink "AbstractLoader/TEXT:property"}}{{/crossLink}},
+	 * Determines if the loader can load a specific item. This loader loads items that are of type {{#crossLink "Types/TEXT:property"}}{{/crossLink}},
 	 * but is also the default loader if a file type can not be determined.
 	 * @method canLoadItem
 	 * @param {LoadItem|Object} item The LoadItem that a LoadQueue is trying to load.
@@ -22401,7 +21852,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @static
 	 */
 	s.canLoadItem = function (item) {
-		return item.type == createjs.AbstractLoader.TEXT;
+		return item.type == createjs.Types.TEXT;
 	};
 
 	createjs.TextLoader = createjs.promote(TextLoader, "AbstractLoader");
@@ -22424,7 +21875,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @constructor
 	 */
 	function BinaryLoader(loadItem) {
-		this.AbstractLoader_constructor(loadItem, true, createjs.AbstractLoader.BINARY);
+		this.AbstractLoader_constructor(loadItem, true, createjs.Types.BINARY);
 		this.on("initialize", this._updateXHR, this);
 	};
 
@@ -22434,14 +21885,14 @@ createjs.indexOf = function (array, searchElement){
 	// static methods
 	/**
 	 * Determines if the loader can load a specific item. This loader can only load items that are of type
-	 * {{#crossLink "AbstractLoader/BINARY:property"}}{{/crossLink}}
+	 * {{#crossLink "Types/BINARY:property"}}{{/crossLink}}
 	 * @method canLoadItem
 	 * @param {LoadItem|Object} item The LoadItem that a LoadQueue is trying to load.
 	 * @returns {Boolean} Whether the loader can load the item.
 	 * @static
 	 */
 	s.canLoadItem = function (item) {
-		return item.type == createjs.AbstractLoader.BINARY;
+		return item.type == createjs.Types.BINARY;
 	};
 
 	// private methods
@@ -22476,7 +21927,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @constructor
 	 */
 	function CSSLoader(loadItem, preferXHR) {
-		this.AbstractLoader_constructor(loadItem, preferXHR, createjs.AbstractLoader.CSS);
+		this.AbstractLoader_constructor(loadItem, preferXHR, createjs.Types.CSS);
 
 		// public properties
 		this.resultFormatter = this._formatResult;
@@ -22500,14 +21951,14 @@ createjs.indexOf = function (array, searchElement){
 	// static methods
 	/**
 	 * Determines if the loader can load a specific item. This loader can only load items that are of type
-	 * {{#crossLink "AbstractLoader/CSS:property"}}{{/crossLink}}.
+	 * {{#crossLink "Types/CSS:property"}}{{/crossLink}}.
 	 * @method canLoadItem
 	 * @param {LoadItem|Object} item The LoadItem that a LoadQueue is trying to load.
 	 * @returns {Boolean} Whether the loader can load the item.
 	 * @static
 	 */
 	s.canLoadItem = function (item) {
-		return item.type == createjs.AbstractLoader.CSS;
+		return item.type == createjs.Types.CSS;
 	};
 
 	// protected methods
@@ -22620,14 +22071,14 @@ createjs.indexOf = function (array, searchElement){
     
     /**
      * Determines if the loader can load a specific item. This loader can only load items that are of type
-     * {{#crossLink "AbstractLoader/FONT:property"}}{{/crossLink}}.
+     * {{#crossLink "Types/FONT:property"}}{{/crossLink}}.
      * @method canLoadItem
      * @param {LoadItem|Object} item The LoadItem that a LoadQueue is trying to load.
      * @returns {Boolean} Whether the loader can load the item.
      * @static
      */
     FontLoader.canLoadItem = function (item) {
-        return item.type == createjs.AbstractLoader.FONT || item.type == createjs.AbstractLoader.FONTCSS;
+        return item.type == createjs.Types.FONT || item.type == createjs.Types.FONTCSS;
     };
 
 // static properties:
@@ -22723,7 +22174,7 @@ createjs.indexOf = function (array, searchElement){
 	FontLoader.WATCH_DURATION = 10;
 // public methods:
 	p.load = function() {
-		if (this.type == createjs.AbstractLoader.FONTCSS) {
+		if (this.type == createjs.Types.FONTCSS) {
 			var loaded = this._watchCSS();
 
 			// If the CSS is not ready, it will create a request, which AbstractLoader can handle.
@@ -23104,7 +22555,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @constructor
 	 */
 	function ImageLoader (loadItem, preferXHR) {
-		this.AbstractLoader_constructor(loadItem, preferXHR, createjs.AbstractLoader.IMAGE);
+		this.AbstractLoader_constructor(loadItem, preferXHR, createjs.Types.IMAGE);
 
 		// public properties
 		this.resultFormatter = this._formatResult;
@@ -23136,14 +22587,14 @@ createjs.indexOf = function (array, searchElement){
 	// static methods
 	/**
 	 * Determines if the loader can load a specific item. This loader can only load items that are of type
-	 * {{#crossLink "AbstractLoader/IMAGE:property"}}{{/crossLink}}.
+	 * {{#crossLink "Types/IMAGE:property"}}{{/crossLink}}.
 	 * @method canLoadItem
 	 * @param {LoadItem|Object} item The LoadItem that a LoadQueue is trying to load.
 	 * @returns {Boolean} Whether the loader can load the item.
 	 * @static
 	 */
 	s.canLoadItem = function (item) {
-		return item.type == createjs.AbstractLoader.IMAGE;
+		return item.type == createjs.Types.IMAGE;
 	};
 
 	// public methods
@@ -23219,10 +22670,12 @@ createjs.indexOf = function (array, searchElement){
 		} else {
             tag.onload = createjs.proxy(function() {
                 successCallback(this._tag);
+                tag.onload = tag.onerror = null;
             }, this);
 
-            tag.onerror = createjs.proxy(function() {
-                errorCallback(new createjs.ErrorEvent('IMAGE_FORMAT'));
+            tag.onerror = createjs.proxy(function(event) {
+                errorCallback(new createjs.ErrorEvent('IMAGE_FORMAT', null, event));
+                tag.onload = tag.onerror = null;
             }, this);
 		}
 	};
@@ -23261,7 +22714,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @constructor
 	 */
 	function JavaScriptLoader(loadItem, preferXHR) {
-		this.AbstractLoader_constructor(loadItem, preferXHR, createjs.AbstractLoader.JAVASCRIPT);
+		this.AbstractLoader_constructor(loadItem, preferXHR, createjs.Types.JAVASCRIPT);
 
 		// public properties
 		this.resultFormatter = this._formatResult;
@@ -23277,14 +22730,14 @@ createjs.indexOf = function (array, searchElement){
 	// static methods
 	/**
 	 * Determines if the loader can load a specific item. This loader can only load items that are of type
-	 * {{#crossLink "AbstractLoader/JAVASCRIPT:property"}}{{/crossLink}}
+	 * {{#crossLink "Types/JAVASCRIPT:property"}}{{/crossLink}}
 	 * @method canLoadItem
 	 * @param {LoadItem|Object} item The LoadItem that a LoadQueue is trying to load.
 	 * @returns {Boolean} Whether the loader can load the item.
 	 * @static
 	 */
 	s.canLoadItem = function (item) {
-		return item.type == createjs.AbstractLoader.JAVASCRIPT;
+		return item.type == createjs.Types.JAVASCRIPT;
 	};
 
 	// protected methods
@@ -23325,7 +22778,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @constructor
 	 */
 	function JSONLoader(loadItem) {
-		this.AbstractLoader_constructor(loadItem, true, createjs.AbstractLoader.JSON);
+		this.AbstractLoader_constructor(loadItem, true, createjs.Types.JSON);
 
 		// public properties
 		this.resultFormatter = this._formatResult;
@@ -23337,14 +22790,14 @@ createjs.indexOf = function (array, searchElement){
 	// static methods
 	/**
 	 * Determines if the loader can load a specific item. This loader can only load items that are of type
-	 * {{#crossLink "AbstractLoader/JSON:property"}}{{/crossLink}}.
+	 * {{#crossLink "Types/JSON:property"}}{{/crossLink}}.
 	 * @method canLoadItem
 	 * @param {LoadItem|Object} item The LoadItem that a LoadQueue is trying to load.
 	 * @returns {Boolean} Whether the loader can load the item.
 	 * @static
 	 */
 	s.canLoadItem = function (item) {
-		return item.type == createjs.AbstractLoader.JSON;
+		return item.type == createjs.Types.JSON;
 	};
 
 	// protected methods
@@ -23410,9 +22863,12 @@ createjs.indexOf = function (array, searchElement){
 	 * 			console.log(json.obj.bool); // true
 	 * 		}
 	 *
-	 * Note that JSONP files loaded concurrently require a <em>unique</em> callback. To ensure JSONP files are loaded
-	 * in order, either use the {{#crossLink "LoadQueue/setMaxConnections"}}{{/crossLink}} method (set to 1),
-	 * or set {{#crossLink "LoadItem/maintainOrder:property"}}{{/crossLink}} on items with the same callback.
+	 * JSONP files loaded concurrently require a <em>unique</em> callback. To ensure JSONP files are loaded in order,
+	 * either use the {{#crossLink "LoadQueue/setMaxConnections"}}{{/crossLink}} method (set to 1), or set
+	 * {{#crossLink "LoadItem/maintainOrder:property"}}{{/crossLink}} on items with the same callback.
+	 *
+	 * Important note: Some browsers will prevent JSONP from firing the callback if the file was loaded as JSON, and not
+	 * JavaScript. You may have to have your server give you a JavaScript mime-type for this to work.
 	 *
 	 * @class JSONPLoader
 	 * @param {LoadItem|Object} loadItem
@@ -23420,7 +22876,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @constructor
 	 */
 	function JSONPLoader(loadItem) {
-		this.AbstractLoader_constructor(loadItem, false, createjs.AbstractLoader.JSONP);
+		this.AbstractLoader_constructor(loadItem, false, createjs.Types.JSONP);
 		this.setTag(createjs.Elements.script());
 		this.getTag().type = "text/javascript";
 	};
@@ -23432,14 +22888,14 @@ createjs.indexOf = function (array, searchElement){
 	// static methods
 	/**
 	 * Determines if the loader can load a specific item. This loader can only load items that are of type
-	 * {{#crossLink "AbstractLoader/JSONP:property"}}{{/crossLink}}.
+	 * {{#crossLink "Types/JSONP:property"}}{{/crossLink}}.
 	 * @method canLoadItem
 	 * @param {LoadItem|Object} item The LoadItem that a LoadQueue is trying to load.
 	 * @returns {Boolean} Whether the loader can load the item.
 	 * @static
 	 */
 	s.canLoadItem = function (item) {
-		return item.type == createjs.AbstractLoader.JSONP;
+		return item.type == createjs.Types.JSONP;
 	};
 
 	// public methods
@@ -23551,14 +23007,17 @@ createjs.indexOf = function (array, searchElement){
 	 *
 	 * Note that the {{#crossLink "JSONLoader"}}{{/crossLink}} and {{#crossLink "JSONPLoader"}}{{/crossLink}} are
 	 * higher priority loaders, so manifests <strong>must</strong> set the {{#crossLink "LoadItem"}}{{/crossLink}}
-	 * {{#crossLink "LoadItem/type:property"}}{{/crossLink}} property to {{#crossLink "AbstractLoader/MANIFEST:property"}}{{/crossLink}}.
+	 * {{#crossLink "LoadItem/type:property"}}{{/crossLink}} property to {{#crossLink "Types/MANIFEST:property"}}{{/crossLink}}.
+	 *
+	 * Additionally, some browsers require the server to serve a JavaScript mime-type for JSONP, so it may not work in
+	 * some conditions.
 	 * @class ManifestLoader
 	 * @param {LoadItem|Object} loadItem
 	 * @extends AbstractLoader
 	 * @constructor
 	 */
-	function ManifestLoader(loadItem) {
-		this.AbstractLoader_constructor(loadItem, null, createjs.AbstractLoader.MANIFEST);
+	function ManifestLoader(loadItem, preferXHR) {
+		this.AbstractLoader_constructor(loadItem, preferXHR, createjs.Types.MANIFEST);
 
 	// Public Properties
 		/**
@@ -23599,14 +23058,14 @@ createjs.indexOf = function (array, searchElement){
 	// static methods
 	/**
 	 * Determines if the loader can load a specific item. This loader can only load items that are of type
-	 * {{#crossLink "AbstractLoader/MANIFEST:property"}}{{/crossLink}}
+	 * {{#crossLink "Types/MANIFEST:property"}}{{/crossLink}}
 	 * @method canLoadItem
 	 * @param {LoadItem|Object} item The LoadItem that a LoadQueue is trying to load.
 	 * @returns {Boolean} Whether the loader can load the item.
 	 * @static
 	 */
 	s.canLoadItem = function (item) {
-		return item.type == createjs.AbstractLoader.MANIFEST;
+		return item.type == createjs.Types.MANIFEST;
 	};
 
 	// public methods
@@ -23655,7 +23114,7 @@ createjs.indexOf = function (array, searchElement){
 	 */
 	p._loadManifest = function (json) {
 		if (json && json.manifest) {
-			var queue = this._manifestQueue = new createjs.LoadQueue();
+			var queue = this._manifestQueue = new createjs.LoadQueue(this._preferXHR);
 			queue.on("fileload", this._handleManifestFileLoad, this);
 			queue.on("progress", this._handleManifestProgress, this);
 			queue.on("complete", this._handleManifestComplete, this, true);
@@ -23739,7 +23198,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @constructor
 	 */
 	function SoundLoader(loadItem, preferXHR) {
-		this.AbstractMediaLoader_constructor(loadItem, preferXHR, createjs.AbstractLoader.SOUND);
+		this.AbstractMediaLoader_constructor(loadItem, preferXHR, createjs.Types.SOUND);
 
 		// protected properties
 		if (createjs.DomUtils.isAudioTag(loadItem)) {
@@ -23761,14 +23220,14 @@ createjs.indexOf = function (array, searchElement){
 	// static methods
 	/**
 	 * Determines if the loader can load a specific item. This loader can only load items that are of type
-	 * {{#crossLink "AbstractLoader/SOUND:property"}}{{/crossLink}}.
+	 * {{#crossLink "Types/SOUND:property"}}{{/crossLink}}.
 	 * @method canLoadItem
 	 * @param {LoadItem|Object} item The LoadItem that a LoadQueue is trying to load.
 	 * @returns {Boolean} Whether the loader can load the item.
 	 * @static
 	 */
 	s.canLoadItem = function (item) {
-		return item.type == createjs.AbstractLoader.SOUND;
+		return item.type == createjs.Types.SOUND;
 	};
 
 	// protected methods
@@ -23803,7 +23262,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @constructor
 	 */
 	function VideoLoader(loadItem, preferXHR) {
-		this.AbstractMediaLoader_constructor(loadItem, preferXHR, createjs.AbstractLoader.VIDEO);
+		this.AbstractMediaLoader_constructor(loadItem, preferXHR, createjs.Types.VIDEO);
 
 		if (createjs.DomUtils.isVideoTag(loadItem) || createjs.DomUtils.isVideoTag(loadItem.src)) {
 			this.setTag(createjs.DomUtils.isVideoTag(loadItem)?loadItem:loadItem.src);
@@ -23831,14 +23290,14 @@ createjs.indexOf = function (array, searchElement){
 	// static methods
 	/**
 	 * Determines if the loader can load a specific item. This loader can only load items that are of type
-	 * {{#crossLink "AbstractLoader/VIDEO:property"}}{{/crossLink}}.
+	 * {{#crossLink "Types/VIDEO:property"}}{{/crossLink}}.
 	 * @method canLoadItem
 	 * @param {LoadItem|Object} item The LoadItem that a LoadQueue is trying to load.
 	 * @returns {Boolean} Whether the loader can load the item.
 	 * @static
 	 */
 	s.canLoadItem = function (item) {
-		return item.type == createjs.AbstractLoader.VIDEO;
+		return item.type == createjs.Types.VIDEO;
 	};
 
 	createjs.VideoLoader = createjs.promote(VideoLoader, "AbstractMediaLoader");
@@ -23859,7 +23318,7 @@ createjs.indexOf = function (array, searchElement){
 	 * as part of the {{#crossLink "LoadItem"}}{{/crossLink}}. Note that the {{#crossLink "JSONLoader"}}{{/crossLink}}
 	 * and {{#crossLink "JSONPLoader"}}{{/crossLink}} are higher priority loaders, so SpriteSheets <strong>must</strong>
 	 * set the {{#crossLink "LoadItem"}}{{/crossLink}} {{#crossLink "LoadItem/type:property"}}{{/crossLink}} property
-	 * to {{#crossLink "AbstractLoader/SPRITESHEET:property"}}{{/crossLink}}.
+	 * to {{#crossLink "Types/SPRITESHEET:property"}}{{/crossLink}}.
 	 *
 	 * The {{#crossLink "LoadItem"}}{{/crossLink}} {{#crossLink "LoadItem/crossOrigin:property"}}{{/crossLink}} as well
 	 * as the {{#crossLink "LoadQueue's"}}{{/crossLink}} `basePath` argument and {{#crossLink "LoadQueue/_preferXHR"}}{{/crossLink}}
@@ -23876,7 +23335,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @constructor
 	 */
 	function SpriteSheetLoader(loadItem, preferXHR) {
-		this.AbstractLoader_constructor(loadItem, preferXHR, createjs.AbstractLoader.SPRITESHEET);
+		this.AbstractLoader_constructor(loadItem, preferXHR, createjs.Types.SPRITESHEET);
 
 		// protected properties
 		/**
@@ -23905,14 +23364,14 @@ createjs.indexOf = function (array, searchElement){
 	// static methods
 	/**
 	 * Determines if the loader can load a specific item. This loader can only load items that are of type
-	 * {{#crossLink "AbstractLoader/SPRITESHEET:property"}}{{/crossLink}}
+	 * {{#crossLink "Types/SPRITESHEET:property"}}{{/crossLink}}
 	 * @method canLoadItem
 	 * @param {LoadItem|Object} item The LoadItem that a LoadQueue is trying to load.
 	 * @returns {Boolean} Whether the loader can load the item.
 	 * @static
 	 */
 	s.canLoadItem = function (item) {
-		return item.type == createjs.AbstractLoader.SPRITESHEET;
+		return item.type == createjs.Types.SPRITESHEET;
 	};
 
 	// public methods
@@ -24038,7 +23497,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @constructor
 	 */
 	function SVGLoader(loadItem, preferXHR) {
-		this.AbstractLoader_constructor(loadItem, preferXHR, createjs.AbstractLoader.SVG);
+		this.AbstractLoader_constructor(loadItem, preferXHR, createjs.Types.SVG);
 
 		// public properties
 		this.resultFormatter = this._formatResult;
@@ -24060,14 +23519,14 @@ createjs.indexOf = function (array, searchElement){
 	// static methods
 	/**
 	 * Determines if the loader can load a specific item. This loader can only load items that are of type
-	 * {{#crossLink "AbstractLoader/SVG:property"}}{{/crossLink}}
+	 * {{#crossLink "Types/SVG:property"}}{{/crossLink}}
 	 * @method canLoadItem
 	 * @param {LoadItem|Object} item The LoadItem that a LoadQueue is trying to load.
 	 * @returns {Boolean} Whether the loader can load the item.
 	 * @static
 	 */
 	s.canLoadItem = function (item) {
-		return item.type == createjs.AbstractLoader.SVG;
+		return item.type == createjs.Types.SVG;
 	};
 
 	// protected methods
@@ -24120,7 +23579,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @constructor
 	 */
 	function XMLLoader(loadItem) {
-		this.AbstractLoader_constructor(loadItem, true, createjs.AbstractLoader.XML);
+		this.AbstractLoader_constructor(loadItem, true, createjs.Types.XML);
 
 		// public properties
 		this.resultFormatter = this._formatResult;
@@ -24132,14 +23591,14 @@ createjs.indexOf = function (array, searchElement){
 	// static methods
 	/**
 	 * Determines if the loader can load a specific item. This loader can only load items that are of type
-	 * {{#crossLink "AbstractLoader/XML:property"}}{{/crossLink}}.
+	 * {{#crossLink "Types/XML:property"}}{{/crossLink}}.
 	 * @method canLoadItem
 	 * @param {LoadItem|Object} item The LoadItem that a LoadQueue is trying to load.
 	 * @returns {Boolean} Whether the loader can load the item.
 	 * @static
 	 */
 	s.canLoadItem = function (item) {
-		return item.type == createjs.AbstractLoader.XML;
+		return item.type == createjs.Types.XML;
 	};
 
 	// protected methods
@@ -24186,7 +23645,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @type String
 	 * @static
 	 **/
-	s.buildDate = /*=date*/"Thu, 18 May 2017 18:25:57 GMT"; // injected by build process
+	s.buildDate = /*=date*/"Tue, 22 Aug 2017 12:38:07 GMT"; // injected by build process
 
 })();
 
@@ -24337,9 +23796,10 @@ createjs.indexOf = function (array, searchElement){
 	 *
 	 * <h4>Example</h4>
 	 *
-	 * 	var ppc = new createjs.PlayPropsConfig().set({interrupt: createjs.Sound.INTERRUPT_ANY, loop: -1, volume: 0.5})
-	 * 	createjs.Sound.play("mySound", ppc);
-	 * 	mySoundInstance.play(ppc);
+	 * 	var props = new createjs.PlayPropsConfig().set({interrupt: createjs.Sound.INTERRUPT_ANY, loop: -1, volume: 0.5})
+	 * 	createjs.Sound.play("mySound", props);
+	 * 	// OR
+	 * 	mySoundInstance.play(props);
 	 *
 	 * @class PlayPropsConfig
 	 * @constructor
@@ -24431,12 +23891,14 @@ createjs.indexOf = function (array, searchElement){
 	 * @static
 	 */
 	s.create = function (value) {
-		if (value instanceof s || value instanceof Object) {
-			var ppc = new createjs.PlayPropsConfig();
-			ppc.set(value);
-			return ppc;
-		} else {
-			throw new Error("Type not recognized.");
+		if (typeof(value) === "string") {
+			// Handle the old API gracefully.
+			console && (console.warn || console.log)("Deprecated behaviour. Sound.play takes a configuration object instead of individual arguments. See docs for info.");
+			return new createjs.PlayPropsConfig().set({interrupt:value});
+		} else if (value == null || value instanceof s || value instanceof Object) {
+			return new createjs.PlayPropsConfig().set(value);
+		} else if (value == null) {
+			throw new Error("PlayProps configuration not recognized.");
 		}
 	};
 
@@ -24453,7 +23915,9 @@ createjs.indexOf = function (array, searchElement){
 	 * @return {PlayPropsConfig} Returns the instance the method is called on (useful for chaining calls.)
 	*/
 	p.set = function(props) {
-		for (var n in props) { this[n] = props[n]; }
+		if (props != null) {
+			for (var n in props) { this[n] = props[n]; }
+		}
 		return this;
 	};
 
@@ -24777,7 +24241,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @property FILE_PATTERN
 	 * @type {RegExp}
 	 * @static
-	 * @protected
+	 * @private
 	 */
 	s.FILE_PATTERN = /^(?:(\w+:)\/{2}(\w+(?:\.\w+)*\/?))?([/.]*?(?:[^?]+)?\/)?((?:[^/?]+)\.(\w+))(?:\?(\S+)?)?$/;
 
@@ -24835,36 +24299,63 @@ createjs.indexOf = function (array, searchElement){
 
 
 // class getter / setter properties
+
 	/**
 	 * Set the master volume of Sound. The master volume is multiplied against each sound's individual volume.  For
 	 * example, if master volume is 0.5 and a sound's volume is 0.5, the resulting volume is 0.25. To set individual
-	 * sound volume, use AbstractSoundInstance {{#crossLink "AbstractSoundInstance/volume:property"}}{{/crossLink}} instead.
+	 * sound volume, use AbstractSoundInstance {{#crossLink "AbstractSoundInstance/volume:property"}}{{/crossLink}}
+	 * instead.
 	 *
 	 * <h4>Example</h4>
 	 *
 	 *     createjs.Sound.volume = 0.5;
-	 *
 	 *
 	 * @property volume
 	 * @type {Number}
 	 * @default 1
 	 * @since 0.6.1
 	 */
+
+	/**
+	 * The internal volume level. Use {{#crossLink "Sound/volume:property"}}{{/crossLink}} to adjust the master volume.
+	 * @property _masterVolume
+	 * @type {number}
+	 * @default 1
+	 * @private
+	 */
 	s._masterVolume = 1;
-	Object.defineProperty(s, "volume", {
-		get: function () {return this._masterVolume;},
-		set: function (value) {
-				if (Number(value) == null) {return false;}
-				value = Math.max(0, Math.min(1, value));
-				s._masterVolume = value;
-				if (!this.activePlugin || !this.activePlugin.setVolume || !this.activePlugin.setVolume(value)) {
-					var instances = this._instances;
-					for (var i = 0, l = instances.length; i < l; i++) {
-						instances[i].setMasterVolume(value);
-					}
-				}
+
+	/**
+	 * Use the {{#crossLink "Sound/volume:property"}}{{/crossLink}} property instead.
+	 * @method _getMasterVolume
+	 * @private
+	 * @static
+	 * @return {Number}
+	 **/
+	s._getMasterVolume = function() {
+		return this._masterVolume;
+	};
+	// Sound.getMasterVolume is @deprecated. Remove for 1.1+
+	s.getVolume = createjs.deprecate(s._getMasterVolume, "Sound.getVolume");
+	/**
+	 * Use the {{#crossLink "Sound/volume:property"}}{{/crossLink}} property instead.
+	 * @method _setMasterVolume
+	 * @static
+	 * @private
+	 **/
+	s._setMasterVolume = function(value) {
+		if (Number(value) == null) { return; }
+		value = Math.max(0, Math.min(1, value));
+		s._masterVolume = value;
+		if (!this.activePlugin || !this.activePlugin.setVolume || !this.activePlugin.setVolume(value)) {
+			var instances = this._instances;
+			for (var i = 0, l = instances.length; i < l; i++) {
+				instances[i].setMasterVolume(value);
 			}
-	});
+		}
+	};
+	// Sound.stMasterVolume is @deprecated. Remove for 1.1+
+	s.setVolume = createjs.deprecate(s._setMasterVolume, "Sound.setVolume");
 
 	/**
 	 * Mute/Unmute all audio. Note that muted audio still plays at 0 volume. This global mute value is maintained
@@ -24882,22 +24373,39 @@ createjs.indexOf = function (array, searchElement){
 	 * @since 0.6.1
 	 */
 	s._masterMute = false;
-	// OJR references to the methods were not working, so the code had to be duplicated here
-	Object.defineProperty(s, "muted", {
-		get: function () {return this._masterMute;},
-		set: function (value) {
-				if (value == null) {return false;}
 
-				this._masterMute = value;
-				if (!this.activePlugin || !this.activePlugin.setMute || !this.activePlugin.setMute(value)) {
-					var instances = this._instances;
-					for (var i = 0, l = instances.length; i < l; i++) {
-						instances[i].setMasterMute(value);
-					}
-				}
-				return true;
+	/**
+	 * Use the {{#crossLink "Sound/muted:property"}}{{/crossLink}} property instead.
+	 * @method _getMute
+	 * @returns {Boolean}
+	 * @static
+	 * @private
+	 */
+	s._getMute = function () {
+		return this._masterMute;
+	};
+	// Sound.getMute is @deprecated. Remove for 1.1+
+	s.getMute = createjs.deprecate(s._getMute, "Sound.getMute");
+
+	/**
+	 * Use the {{#crossLink "Sound/muted:property"}}{{/crossLink}} property instead.
+	 * @method _setMute
+	 * @param {Boolean} value The muted value
+	 * @static
+	 * @private
+	 */
+	s._setMute = function (value) {
+		if (value == null) { return; }
+		this._masterMute = value;
+		if (!this.activePlugin || !this.activePlugin.setMute || !this.activePlugin.setMute(value)) {
+			var instances = this._instances;
+			for (var i = 0, l = instances.length; i < l; i++) {
+				instances[i].setMasterMute(value);
 			}
-	});
+		}
+	};
+	// Sound.setMute is @deprecated. Remove for 1.1+
+	s.setMute = createjs.deprecate(s._setMute, "Sound.setMute");
 
 	/**
 	 * Get the active plugins capabilities, which help determine if a plugin can be used in the current environment,
@@ -24933,25 +24441,36 @@ createjs.indexOf = function (array, searchElement){
 	 * @readOnly
 	 * @since 0.6.1
 	 */
-	Object.defineProperty(s, "capabilities", {
-		get: function () {
-					if (s.activePlugin == null) {return null;}
-					return s.activePlugin._capabilities;
-				},
-		set: function (value) { return false;}
+
+	/**
+	 * Use the {{#crossLink "Sound/capabilities:property"}}{{/crossLink}} property instead.
+	 * @returns {null}
+	 * @private
+	 */
+	s._getCapabilities = function() {
+		if (s.activePlugin == null) { return null; }
+		return s.activePlugin._capabilities;
+	};
+	// Sound.getCapabilities is @deprecated. Remove for 1.1+
+	s.getCapabilities = createjs.deprecate(s._getCapabilities, "Sound.getCapabilities");
+
+	Object.defineProperties(s, {
+		volume: { get: s._getMasterVolume, set: s._setMasterVolume },
+		muted: { get: s._getMute, set: s._setMute },
+		capabilities: { get: s._getCapabilities }
 	});
 
 
 // Class Private properties
 	/**
-	 * Determines if the plugins have been registered. If false, the first call to play() will instantiate the default
+	 * Determines if the plugins have been registered. If false, the first call to {{#crossLink "play"}}{{/crossLink}} will instantiate the default
 	 * plugins ({{#crossLink "WebAudioPlugin"}}{{/crossLink}}, followed by {{#crossLink "HTMLAudioPlugin"}}{{/crossLink}}).
 	 * If plugins have been registered, but none are applicable, then sound playback will fail.
 	 * @property _pluginsRegistered
 	 * @type {Boolean}
 	 * @default false
 	 * @static
-	 * @protected
+	 * @private
 	 */
 	s._pluginsRegistered = false;
 
@@ -24960,19 +24479,19 @@ createjs.indexOf = function (array, searchElement){
 	 * @property _lastID
 	 * @type {Number}
 	 * @static
-	 * @protected
+	 * @private
 	 */
 	s._lastID = 0;
 
 	/**
 	 * An array containing all currently playing instances. This allows Sound to control the volume, mute, and playback of
-	 * all instances when using static APIs like {{#crossLink "Sound/stop"}}{{/crossLink}} and {{#crossLink "Sound/setVolume"}}{{/crossLink}}.
+	 * all instances when using static APIs like {{#crossLink "Sound/stop"}}{{/crossLink}} and {{#crossLink "Sound/volume:property"}}{{/crossLink}}.
 	 * When an instance has finished playback, it gets removed via the {{#crossLink "Sound/finishedPlaying"}}{{/crossLink}}
 	 * method. If the user replays an instance, it gets added back in via the {{#crossLink "Sound/_beginPlaying"}}{{/crossLink}}
 	 * method.
 	 * @property _instances
 	 * @type {Array}
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	s._instances = [];
@@ -24981,7 +24500,7 @@ createjs.indexOf = function (array, searchElement){
 	 * An object hash storing objects with sound sources, startTime, and duration via there corresponding ID.
 	 * @property _idHash
 	 * @type {Object}
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	s._idHash = {};
@@ -24992,7 +24511,7 @@ createjs.indexOf = function (array, searchElement){
 	 * and data.
 	 * @property _preloadHash
 	 * @type {Object}
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	s._preloadHash = {};
@@ -25002,7 +24521,7 @@ createjs.indexOf = function (array, searchElement){
 	 * {{#crossLink "Sound/registerSound"}}{{/crossLink}} and {{#crossLink "Sound/registerSounds"}}{{/crossLink}}.
 	 * @property _defaultPlayPropsHash
 	 * @type {Object}
-	 * @protected
+	 * @private
 	 * @static
 	 * @since 0.6.1
 	 */
@@ -25059,7 +24578,7 @@ createjs.indexOf = function (array, searchElement){
 	 *      <li>types: A list of file types that are supported by Sound (currently supports "sound").</li>
 	 *      <li>extensions: A list of file extensions that are supported by Sound (see {{#crossLink "Sound/SUPPORTED_EXTENSIONS:property"}}{{/crossLink}}).</li></ul>
 	 * @static
-	 * @protected
+	 * @private
 	 */
 	s.getPreloadHandlers = function () {
 		return {
@@ -25073,7 +24592,7 @@ createjs.indexOf = function (array, searchElement){
 	 * Used to dispatch fileload events from internal loading.
 	 * @method _handleLoadComplete
 	 * @param event A loader event.
-	 * @protected
+	 * @private
 	 * @static
 	 * @since 0.6.0
 	 */
@@ -25100,7 +24619,7 @@ createjs.indexOf = function (array, searchElement){
 	/**
 	 * Used to dispatch error events from internal preloading.
 	 * @param event
-	 * @protected
+	 * @private
 	 * @since 0.6.0
 	 * @static
 	 */
@@ -25206,40 +24725,12 @@ createjs.indexOf = function (array, searchElement){
 	};
 
 	/**
-	 * Deprecated, please use {{#crossLink "Sound/capabilities:property"}}{{/crossLink}} instead.
-	 *
-	 * @method getCapabilities
-	 * @return {Object} An object containing the capabilities of the active plugin.
-	 * @static
-	 * @deprecated
-	 */
-	s.getCapabilities = function () {
-		if (s.activePlugin == null) {return null;}
-		return s.activePlugin._capabilities;
-	};
-
-	/**
-	 * Deprecated, please use {{#crossLink "Sound/capabilities:property"}}{{/crossLink}} instead.
-	 *
-	 * @method getCapability
-	 * @param {String} key The capability to retrieve
-	 * @return {Number|Boolean} The value of the capability.
-	 * @static
-	 * @see getCapabilities
-	 * @deprecated
-	 */
-	s.getCapability = function (key) {
-		if (s.activePlugin == null) {return null;}
-		return s.activePlugin._capabilities[key];
-	};
-
-	/**
 	 * Process manifest items from <a href="http://preloadjs.com" target="_blank">PreloadJS</a>. This method is intended
 	 * for usage by a plugin, and not for direct interaction.
 	 * @method initLoad
 	 * @param {Object} src The object to load.
 	 * @return {Object|AbstractLoader} An instance of AbstractLoader.
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	s.initLoad = function (loadItem) {
@@ -25575,7 +25066,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @param {String} value The path to an audio source.
 	 * @return {Object} A formatted object that can be registered with the {{#crossLink "Sound/activePlugin:property"}}{{/crossLink}}
 	 * and returned to a preloader like <a href="http://preloadjs.com" target="_blank">PreloadJS</a>.
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	s._parsePath = function (value) {
@@ -25605,7 +25096,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @param {Object} value The paths to an audio source, indexed by extension type.
 	 * @return {Object} A formatted object that can be registered with the {{#crossLink "Sound/activePlugin:property"}}{{/crossLink}}
 	 * and returned to a preloader like <a href="http://preloadjs.com" target="_blank">PreloadJS</a>.
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	s._parseSrc = function (value) {
@@ -25635,11 +25126,12 @@ createjs.indexOf = function (array, searchElement){
 	 Static API.
 	 --------------- */
 	/**
-	 * Play a sound and get a {{#crossLink "AbstractSoundInstance"}}{{/crossLink}} to control. If the sound fails to play, a
-	 * AbstractSoundInstance will still be returned, and have a playState of {{#crossLink "Sound/PLAY_FAILED:property"}}{{/crossLink}}.
-	 * Note that even on sounds with failed playback, you may still be able to call AbstractSoundInstance {{#crossLink "AbstractSoundInstance/play"}}{{/crossLink}},
-	 * since the failure could be due to lack of available channels. If the src does not have a supported extension or
-	 * if there is no available plugin, a default AbstractSoundInstance will be returned which will not play any audio, but will not generate errors.
+	 * Play a sound and get a {{#crossLink "AbstractSoundInstance"}}{{/crossLink}} to control. If the sound fails to
+	 * play, an AbstractSoundInstance will still be returned, and have a playState of {{#crossLink "Sound/PLAY_FAILED:property"}}{{/crossLink}}.
+	 * Note that even on sounds with failed playback, you may still be able to call the {{#crossLink "AbstractSoundInstance/play"}}{{/crossLink}},
+	 * method, since the failure could be due to lack of available channels. If the src does not have a supported
+	 * extension or if there is no available plugin, a default AbstractSoundInstance will still be returned, which will
+	 * not play any audio, but will not generate errors.
 	 *
 	 * <h4>Example</h4>
 	 *
@@ -25651,40 +25143,19 @@ createjs.indexOf = function (array, searchElement){
 	 *      	var myInstance = createjs.Sound.play("myID", {interrupt: createjs.Sound.INTERRUPT_ANY, loop:-1});
 	 *      }
 	 *
-	 * NOTE to create an audio sprite that has not already been registered, both startTime and duration need to be set.
+	 * NOTE: To create an audio sprite that has not already been registered, both startTime and duration need to be set.
 	 * This is only when creating a new audio sprite, not when playing using the id of an already registered audio sprite.
-	 *
-	 * <b>Parameters Deprecated</b><br />
-	 * The parameters for this method are deprecated in favor of a single parameter that is an Object or {{#crossLink "PlayPropsConfig"}}{{/crossLink}}.
 	 *
 	 * @method play
 	 * @param {String} src The src or ID of the audio.
-	 * @param {String | Object} [interrupt="none"|options] <b>This parameter will be renamed playProps in the next release.</b><br />
-	 * This parameter can be an instance of {{#crossLink "PlayPropsConfig"}}{{/crossLink}} or an Object that contains any or all optional properties by name,
-	 * including: interrupt, delay, offset, loop, volume, pan, startTime, and duration (see the above code sample).
-	 * <br /><strong>OR</strong><br />
-	 * <b>Deprecated</b> How to interrupt any currently playing instances of audio with the same source,
-	 * if the maximum number of instances of the sound are already playing. Values are defined as <code>INTERRUPT_TYPE</code>
-	 * constants on the Sound class, with the default defined by {{#crossLink "Sound/defaultInterruptBehavior:property"}}{{/crossLink}}.
-	 * @param {Number} [delay=0] <b>Deprecated</b> The amount of time to delay the start of audio playback, in milliseconds.
-	 * @param {Number} [offset=0] <b>Deprecated</b> The offset from the start of the audio to begin playback, in milliseconds.
-	 * @param {Number} [loop=0] <b>Deprecated</b> How many times the audio loops when it reaches the end of playback. The default is 0 (no
-	 * loops), and -1 can be used for infinite playback.
-	 * @param {Number} [volume=1] <b>Deprecated</b> The volume of the sound, between 0 and 1. Note that the master volume is applied
-	 * against the individual volume.
-	 * @param {Number} [pan=0] <b>Deprecated</b> The left-right pan of the sound (if supported), between -1 (left) and 1 (right).
-	 * @param {Number} [startTime=null] <b>Deprecated</b> To create an audio sprite (with duration), the initial offset to start playback and loop from, in milliseconds.
-	 * @param {Number} [duration=null] <b>Deprecated</b> To create an audio sprite (with startTime), the amount of time to play the clip for, in milliseconds.
-	 * @return {AbstractSoundInstance} A {{#crossLink "AbstractSoundInstance"}}{{/crossLink}} that can be controlled after it is created.
+	 * @param {Object | PlayPropsConfig} props A PlayPropsConfig instance, or an object that contains the parameters to
+	 * play a sound. See the {{#crossLink "PlayPropsConfig"}}{{/crossLink}} for more info.
+	 * @return {AbstractSoundInstance} A {{#crossLink "AbstractSoundInstance"}}{{/crossLink}} that can be controlled
+	 * after it is created.
 	 * @static
 	 */
-	s.play = function (src, interrupt, delay, offset, loop, volume, pan, startTime, duration) {
-		var playProps;
-		if (interrupt instanceof Object || interrupt instanceof createjs.PlayPropsConfig) {
-			playProps = createjs.PlayPropsConfig.create(interrupt);
-		} else {
-			playProps = createjs.PlayPropsConfig.create({interrupt:interrupt, delay:delay, offset:offset, loop:loop, volume:volume, pan:pan, startTime:startTime, duration:duration});
-		}
+	s.play = function (src, props) {
+		var playProps = createjs.PlayPropsConfig.create(props);
 		var instance = s.createInstance(src, playProps.startTime, playProps.duration);
 		var ok = s._playInstance(instance, playProps);
 		if (!ok) {instance._playFailed();}
@@ -25720,7 +25191,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @static
 	 */
 	s.createInstance = function (src, startTime, duration) {
-		if (!s.initializeDefaultPlugins()) {return new createjs.DefaultSoundInstance(src, startTime, duration);}
+		if (!s.initializeDefaultPlugins()) { return new createjs.DefaultSoundInstance(src, startTime, duration); }
 
 		var defaultPlayProps = s._defaultPlayPropsHash[src];	// for audio sprites, which create and store defaults by id
 		src = s._getSrcById(src);
@@ -25730,11 +25201,11 @@ createjs.indexOf = function (array, searchElement){
 		var instance = null;
 		if (details != null && details.src != null) {
 			SoundChannel.create(details.src);
-			if (startTime == null) {startTime = src.startTime;}
+			if (startTime == null) { startTime = src.startTime; }
 			instance = s.activePlugin.create(details.src, startTime, duration || src.duration);
 
 			defaultPlayProps = defaultPlayProps || s._defaultPlayPropsHash[details.src];
-			if(defaultPlayProps) {
+			if (defaultPlayProps) {
 				instance.applyPlayProps(defaultPlayProps);
 			}
 		} else {
@@ -25762,74 +25233,6 @@ createjs.indexOf = function (array, searchElement){
 		for (var i = instances.length; i--; ) {
 			instances[i].stop();  // NOTE stop removes instance from this._instances
 		}
-	};
-
-	/**
-	 * Deprecated, please use {{#crossLink "Sound/volume:property"}}{{/crossLink}} instead.
-	 *
-	 * @method setVolume
-	 * @param {Number} value The master volume value. The acceptable range is 0-1.
-	 * @static
-	 * @deprecated
-	 */
-	s.setVolume = function (value) {
-		if (Number(value) == null) {return false;}
-		value = Math.max(0, Math.min(1, value));
-		s._masterVolume = value;
-		if (!this.activePlugin || !this.activePlugin.setVolume || !this.activePlugin.setVolume(value)) {
-			var instances = this._instances;
-			for (var i = 0, l = instances.length; i < l; i++) {
-				instances[i].setMasterVolume(value);
-			}
-		}
-	};
-
-	/**
-	 * Deprecated, please use {{#crossLink "Sound/volume:property"}}{{/crossLink}} instead.
-	 *
-	 * @method getVolume
-	 * @return {Number} The master volume, in a range of 0-1.
-	 * @static
-	 * @deprecated
-	 */
-	s.getVolume = function () {
-		return this._masterVolume;
-	};
-
-	/**
-	 * Deprecated, please use {{#crossLink "Sound/muted:property"}}{{/crossLink}} instead.
-	 *
-	 * @method setMute
-	 * @param {Boolean} value Whether the audio should be muted or not.
-	 * @return {Boolean} If the mute was set.
-	 * @static
-	 * @since 0.4.0
-	 * @deprecated
-	 */
-	s.setMute = function (value) {
-		if (value == null) {return false;}
-
-		this._masterMute = value;
-		if (!this.activePlugin || !this.activePlugin.setMute || !this.activePlugin.setMute(value)) {
-			var instances = this._instances;
-			for (var i = 0, l = instances.length; i < l; i++) {
-				instances[i].setMasterMute(value);
-			}
-		}
-		return true;
-	};
-
-	/**
-	 * Deprecated, please use {{#crossLink "Sound/muted:property"}}{{/crossLink}} instead.
-	 *
-	 * @method getMute
-	 * @return {Boolean} The mute value of Sound.
-	 * @static
-	 * @since 0.4.0
-	 * @deprecated
-	 */
-	s.getMute = function () {
-		return this._masterMute;
 	};
 
 	/**
@@ -25872,14 +25275,14 @@ createjs.indexOf = function (array, searchElement){
 	 * @param {PlayPropsConfig} playProps A PlayPropsConfig object.
 	 * @return {Boolean} If the sound can start playing. Sounds that fail immediately will return false. Sounds that
 	 * have a delay will return true, but may still fail to play.
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	s._playInstance = function (instance, playProps) {
 		var defaultPlayProps = s._defaultPlayPropsHash[instance.src] || {};
 		if (playProps.interrupt == null) {playProps.interrupt = defaultPlayProps.interrupt || s.defaultInterruptBehavior};
 		if (playProps.delay == null) {playProps.delay = defaultPlayProps.delay || 0;}
-		if (playProps.offset == null) {playProps.offset = instance.getPosition();}
+		if (playProps.offset == null) {playProps.offset = instance.position;}
 		if (playProps.loop == null) {playProps.loop = instance.loop;}
 		if (playProps.volume == null) {playProps.volume = instance.volume;}
 		if (playProps.pan == null) {playProps.pan = instance.pan;}
@@ -25908,7 +25311,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @param {PlayPropsConfig} playProps A PlayPropsConfig object.
 	 * @return {Boolean} If the sound can start playing. If there are no available channels, or the instance fails to
 	 * start, this will return false.
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	s._beginPlaying = function (instance, playProps) {
@@ -25930,7 +25333,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @method _getSrcById
 	 * @param {String} value The ID the sound was registered with.
 	 * @return {String} The source of the sound if it has been registered with this ID or the value that was passed in.
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	s._getSrcById = function (value) {
@@ -25943,7 +25346,7 @@ createjs.indexOf = function (array, searchElement){
 	 * instances themselves.
 	 * @method _playFinished
 	 * @param {AbstractSoundInstance} instance The instance that finished playback.
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	s._playFinished = function (instance) {
@@ -26073,20 +25476,6 @@ createjs.indexOf = function (array, searchElement){
 
 	var p = SoundChannel.prototype;
 	p.constructor = SoundChannel;
-
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
 
 	/**
 	 * The source of the channel.
@@ -26221,8 +25610,8 @@ createjs.indexOf = function (array, searchElement){
 			}
 
 			// Audio is a better candidate than the current target, according to playhead
-			if ((interrupt == Sound.INTERRUPT_EARLY && target.getPosition() < replacement.getPosition()) ||
-				(interrupt == Sound.INTERRUPT_LATE && target.getPosition() > replacement.getPosition())) {
+			if ((interrupt == Sound.INTERRUPT_EARLY && target.position < replacement.position) ||
+				(interrupt == Sound.INTERRUPT_LATE && target.position > replacement.position)) {
 					replacement = target;
 			}
 		}
@@ -26341,7 +25730,7 @@ createjs.indexOf = function (array, searchElement){
 		 * The volume of the sound, between 0 and 1.
 		 *
 		 * The actual output volume of a sound can be calculated using:
-		 * <code>myInstance.volume * createjs.Sound.getVolume();</code>
+		 * <code>myInstance.volume * createjs.Sound._getVolume();</code>
 		 *
 		 * @property volume
 		 * @type {Number}
@@ -26349,23 +25738,22 @@ createjs.indexOf = function (array, searchElement){
 		 */
 		this._volume =  1;
 		Object.defineProperty(this, "volume", {
-			get: this.getVolume,
-			set: this.setVolume
+			get: this._getVolume,
+			set: this._setVolume
 		});
 
 		/**
 		 * The pan of the sound, between -1 (left) and 1 (right). Note that pan is not supported by HTML Audio.
 		 *
-		 * <br />Note in WebAudioPlugin this only gives us the "x" value of what is actually 3D audio.
-		 *
+		 * Note in WebAudioPlugin this only gives us the "x" value of what is actually 3D audio
 		 * @property pan
 		 * @type {Number}
 		 * @default 0
 		 */
 		this._pan =  0;
 		Object.defineProperty(this, "pan", {
-			get: this.getPan,
-			set: this.setPan
+			get: this._getPan,
+			set: this._setPan
 		});
 
 		/**
@@ -26377,8 +25765,8 @@ createjs.indexOf = function (array, searchElement){
 		 */
 		this._startTime = Math.max(0, startTime || 0);
 		Object.defineProperty(this, "startTime", {
-			get: this.getStartTime,
-			set: this.setStartTime
+			get: this._getStartTime,
+			set: this._setStartTime
 		});
 
 		/**
@@ -26391,8 +25779,8 @@ createjs.indexOf = function (array, searchElement){
 		 */
 		this._duration = Math.max(0, duration || 0);
 		Object.defineProperty(this, "duration", {
-			get: this.getDuration,
-			set: this.setDuration
+			get: this._getDuration,
+			set: this._setDuration
 		});
 
 		/**
@@ -26406,10 +25794,10 @@ createjs.indexOf = function (array, searchElement){
 		 */
 		this._playbackResource = null;
 		Object.defineProperty(this, "playbackResource", {
-			get: this.getPlaybackResource,
-			set: this.setPlaybackResource
+			get: this._getPlaybackResource,
+			set: this._setPlaybackResource
 		});
-		if(playbackResource !== false && playbackResource !== true) { this.setPlaybackResource(playbackResource); }
+		if(playbackResource !== false && playbackResource !== true) { this._setPlaybackResource(playbackResource); }
 
 		/**
 		 * The position of the playhead in milliseconds. This can be set while a sound is playing, paused, or stopped.
@@ -26421,8 +25809,8 @@ createjs.indexOf = function (array, searchElement){
 		 */
 		this._position = 0;
 		Object.defineProperty(this, "position", {
-			get: this.getPosition,
-			set: this.setPosition
+			get: this._getPosition,
+			set: this._setPosition
 		});
 
 		/**
@@ -26436,8 +25824,8 @@ createjs.indexOf = function (array, searchElement){
 		 */
 		this._loop = 0;
 		Object.defineProperty(this, "loop", {
-			get: this.getLoop,
-			set: this.setLoop
+			get: this._getLoop,
+			set: this._setLoop
 		});
 
 		/**
@@ -26450,8 +25838,8 @@ createjs.indexOf = function (array, searchElement){
 		 */
 		this._muted = false;
 		Object.defineProperty(this, "muted", {
-			get: this.getMuted,
-			set: this.setMuted
+			get: this._getMuted,
+			set: this._setMuted
 		});
 
 		/**
@@ -26462,8 +25850,8 @@ createjs.indexOf = function (array, searchElement){
 		 */
 		this._paused = false;
 		Object.defineProperty(this, "paused", {
-			get: this.getPaused,
-			set: this.setPaused
+			get: this._getPaused,
+			set: this._setPaused
 		});
 
 
@@ -26515,10 +25903,6 @@ createjs.indexOf = function (array, searchElement){
 
 	var p = createjs.extend(AbstractSoundInstance, createjs.EventDispatcher);
 
-	// TODO: deprecated
-	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
-
-
 // Public Methods:
 	/**
 	 * Play an instance. This method is intended to be called on SoundInstances that already exist (created
@@ -26535,34 +25919,15 @@ createjs.indexOf = function (array, searchElement){
 	 * The parameters for this method are deprecated in favor of a single parameter that is an Object or {{#crossLink "PlayPropsConfig"}}{{/crossLink}}.
 	 *
 	 * @method play
-	 * @param {String | Object} [interrupt="none"|options] <b>This parameter will be renamed playProps in the next release.</b><br />
-	 * This parameter can be an instance of {{#crossLink "PlayPropsConfig"}}{{/crossLink}} or an Object that contains any or all optional properties by name,
-	 * including: interrupt, delay, offset, loop, volume, pan, startTime, and duration (see the above code sample).
-	 * <br /><strong>OR</strong><br />
-	 * <b>Deprecated</b> How to interrupt any currently playing instances of audio with the same source,
-	 * if the maximum number of instances of the sound are already playing. Values are defined as <code>INTERRUPT_TYPE</code>
-	 * constants on the Sound class, with the default defined by {{#crossLink "Sound/defaultInterruptBehavior:property"}}{{/crossLink}}.
-	 * @param {Number} [delay=0] <b>Deprecated</b> The amount of time to delay the start of audio playback, in milliseconds.
-	 * @param {Number} [offset=0] <b>Deprecated</b> The offset from the start of the audio to begin playback, in milliseconds.
-	 * @param {Number} [loop=0] <b>Deprecated</b> How many times the audio loops when it reaches the end of playback. The default is 0 (no
-	 * loops), and -1 can be used for infinite playback.
-	 * @param {Number} [volume=1] <b>Deprecated</b> The volume of the sound, between 0 and 1. Note that the master volume is applied
-	 * against the individual volume.
-	 * @param {Number} [pan=0] <b>Deprecated</b> The left-right pan of the sound (if supported), between -1 (left) and 1 (right).
-	 * Note that pan is not supported for HTML Audio.
+	 * @param {Object | PlayPropsConfig} props A PlayPropsConfig instance, or an object that contains the parameters to
+	 * play a sound. See the {{#crossLink "PlayPropsConfig"}}{{/crossLink}} for more info.
 	 * @return {AbstractSoundInstance} A reference to itself, intended for chaining calls.
 	 */
-	p.play = function (interrupt, delay, offset, loop, volume, pan) {
-		var playProps;
-		if (interrupt instanceof Object || interrupt instanceof createjs.PlayPropsConfig) {
-			playProps = createjs.PlayPropsConfig.create(interrupt);
-		} else {
-			playProps = createjs.PlayPropsConfig.create({interrupt:interrupt, delay:delay, offset:offset, loop:loop, volume:volume, pan:pan});
-		}
-
+	p.play = function (props) {
+		var playProps = createjs.PlayPropsConfig.create(props);
 		if (this.playState == createjs.Sound.PLAY_SUCCEEDED) {
 			this.applyPlayProps(playProps);
-			if (this._paused) {	this.setPaused(false); }
+			if (this._paused) {	this._setPaused(false); }
 			return;
 		}
 		this._cleanUp();
@@ -26613,13 +25978,13 @@ createjs.indexOf = function (array, searchElement){
 	 * @return {AbstractSoundInstance} A reference to itself, intended for chaining calls.
 	 */
 	p.applyPlayProps = function(playProps) {
-		if (playProps.offset != null) { this.setPosition(playProps.offset) }
-		if (playProps.loop != null) { this.setLoop(playProps.loop); }
-		if (playProps.volume != null) { this.setVolume(playProps.volume); }
-		if (playProps.pan != null) { this.setPan(playProps.pan); }
+		if (playProps.offset != null) { this._setPosition(playProps.offset) }
+		if (playProps.loop != null) { this._setLoop(playProps.loop); }
+		if (playProps.volume != null) { this._setVolume(playProps.volume); }
+		if (playProps.pan != null) { this._setPan(playProps.pan); }
 		if (playProps.startTime != null) {
-			this.setStartTime(playProps.startTime);
-			this.setDuration(playProps.duration);
+			this._setStartTime(playProps.startTime);
+			this._setDuration(playProps.duration);
 		}
 		return this;
 	};
@@ -26630,27 +25995,25 @@ createjs.indexOf = function (array, searchElement){
 
 // get/set methods that allow support for IE8
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/paused:property"}}{{/crossLink}} directly as a property,
-	 *
-	 * @deprecated
-	 * @method getPaused
-	 * @returns {boolean} If the instance is currently paused
+	 * Please use {{#crossLink "AbstractSoundInstance/paused:property"}}{{/crossLink}} directly as a property.
+	 * @method _getPaused
+	 * @protected
+	 * @return {boolean} If the instance is currently paused
 	 * @since 0.6.0
 	 */
-	p.getPaused = function() {
+	p._getPaused = function() {
 		return this._paused;
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/paused:property"}}{{/crossLink}} directly as a property
-	 *
-	 * @deprecated
-	 * @method setPaused
+	 * Please use {{#crossLink "AbstractSoundInstance/paused:property"}}{{/crossLink}} directly as a property
+	 * @method _setPaused
+	 * @protected
 	 * @param {boolean} value
 	 * @since 0.6.0
 	 * @return {AbstractSoundInstance} A reference to itself, intended for chaining calls.
 	 */
-	p.setPaused = function (value) {
+	p._setPaused = function (value) {
 		if ((value !== true && value !== false) || this._paused == value) {return;}
 		if (value == true && this.playState != createjs.Sound.PLAY_SUCCEEDED) {return;}
 		this._paused = value;
@@ -26664,14 +26027,13 @@ createjs.indexOf = function (array, searchElement){
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/volume:property"}}{{/crossLink}} directly as a property
-	 *
-	 * @deprecated
-	 * @method setVolume
+	 * Please use {{#crossLink "AbstractSoundInstance/volume:property"}}{{/crossLink}} directly as a property
+	 * @method _setVolume
+	 * @protected
 	 * @param {Number} value The volume to set, between 0 and 1.
 	 * @return {AbstractSoundInstance} A reference to itself, intended for chaining calls.
 	 */
-	p.setVolume = function (value) {
+	p._setVolume = function (value) {
 		if (value == this._volume) { return this; }
 		this._volume = Math.max(0, Math.min(1, value));
 		if (!this._muted) {
@@ -26681,26 +26043,24 @@ createjs.indexOf = function (array, searchElement){
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/volume:property"}}{{/crossLink}} directly as a property
-	 *
-	 * @deprecated
-	 * @method getVolume
+	 * Please use {{#crossLink "AbstractSoundInstance/volume:property"}}{{/crossLink}} directly as a property
+	 * @method _getVolume
+	 * @protected
 	 * @return {Number} The current volume of the sound instance.
 	 */
-	p.getVolume = function () {
+	p._getVolume = function () {
 		return this._volume;
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/muted:property"}}{{/crossLink}} directly as a property
-	 *
-	 * @deprecated
-	 * @method setMuted
+	 * Please use {{#crossLink "AbstractSoundInstance/muted:property"}}{{/crossLink}} directly as a property
+	 * @method _setMuted
+	 * @protected
 	 * @param {Boolean} value If the sound should be muted.
 	 * @return {AbstractSoundInstance} A reference to itself, intended for chaining calls.
 	 * @since 0.6.0
 	 */
-	p.setMuted = function (value) {
+	p._setMuted = function (value) {
 		if (value !== true && value !== false) {return;}
 		this._muted = value;
 		this._updateVolume();
@@ -26708,26 +26068,24 @@ createjs.indexOf = function (array, searchElement){
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/muted:property"}}{{/crossLink}} directly as a property
-	 *
-	 * @deprecated
-	 * @method getMuted
+	 * Please use {{#crossLink "AbstractSoundInstance/muted:property"}}{{/crossLink}} directly as a property
+	 * @method _getMuted
+	 * @protected
 	 * @return {Boolean} If the sound is muted.
 	 * @since 0.6.0
 	 */
-	p.getMuted = function () {
+	p._getMuted = function () {
 		return this._muted;
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/pan:property"}}{{/crossLink}} directly as a property
-	 *
-	 * @deprecated
-	 * @method setPan
+	 * Please use {{#crossLink "AbstractSoundInstance/pan:property"}}{{/crossLink}} directly as a property
+	 * @method _setPan
+	 * @protected
 	 * @param {Number} value The pan value, between -1 (left) and 1 (right).
 	 * @return {AbstractSoundInstance} Returns reference to itself for chaining calls
 	 */
-	p.setPan = function (value) {
+	p._setPan = function (value) {
 		if(value == this._pan) { return this; }
 		this._pan = Math.max(-1, Math.min(1, value));
 		this._updatePan();
@@ -26735,24 +26093,22 @@ createjs.indexOf = function (array, searchElement){
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/pan:property"}}{{/crossLink}} directly as a property
-	 *
-	 * @deprecated
-	 * @method getPan
+	 * Please use {{#crossLink "AbstractSoundInstance/pan:property"}}{{/crossLink}} directly as a property
+	 * @method _getPan
+	 * @protected
 	 * @return {Number} The value of the pan, between -1 (left) and 1 (right).
 	 */
-	p.getPan = function () {
+	p._getPan = function () {
 		return this._pan;
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/position:property"}}{{/crossLink}} directly as a property
-	 *
-	 * @deprecated
-	 * @method getPosition
+	 * Please use {{#crossLink "AbstractSoundInstance/position:property"}}{{/crossLink}} directly as a property
+	 * @method _getPosition
+	 * @protected
 	 * @return {Number} The position of the playhead in the sound, in milliseconds.
 	 */
-	p.getPosition = function () {
+	p._getPosition = function () {
 		if (!this._paused && this.playState == createjs.Sound.PLAY_SUCCEEDED) {
 			this._position = this._calculateCurrentPosition();
 		}
@@ -26760,14 +26116,13 @@ createjs.indexOf = function (array, searchElement){
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/position:property"}}{{/crossLink}} directly as a property
-	 *
-	 * @deprecated
-	 * @method setPosition
+	 * Please use {{#crossLink "AbstractSoundInstance/position:property"}}{{/crossLink}} directly as a property
+	 * @method _setPosition
+	 * @protected
 	 * @param {Number} value The position to place the playhead, in milliseconds.
 	 * @return {AbstractSoundInstance} Returns reference to itself for chaining calls
 	 */
-	p.setPosition = function (value) {
+	p._setPosition = function (value) {
 		this._position = Math.max(0, value);
 		if (this.playState == createjs.Sound.PLAY_SUCCEEDED) {
 			this._updatePosition();
@@ -26776,25 +26131,23 @@ createjs.indexOf = function (array, searchElement){
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/startTime:property"}}{{/crossLink}} directly as a property
-	 *
-	 * @deprecated
-	 * @method getStartTime
+	 * Please use {{#crossLink "AbstractSoundInstance/startTime:property"}}{{/crossLink}} directly as a property
+	 * @method _getStartTime
+	 * @protected
 	 * @return {Number} The startTime of the sound instance in milliseconds.
 	 */
-	p.getStartTime = function () {
+	p._getStartTime = function () {
 		return this._startTime;
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/startTime:property"}}{{/crossLink}} directly as a property
-	 *
-	 * @deprecated
-	 * @method setStartTime
+	 * Please use {{#crossLink "AbstractSoundInstance/startTime:property"}}{{/crossLink}} directly as a property
+	 * @method _setStartTime
+	 * @protected
 	 * @param {number} value The new startTime time in milli seconds.
 	 * @return {AbstractSoundInstance} Returns reference to itself for chaining calls
 	 */
-	p.setStartTime = function (value) {
+	p._setStartTime = function (value) {
 		if (value == this._startTime) { return this; }
 		this._startTime = Math.max(0, value || 0);
 		this._updateStartTime();
@@ -26802,26 +26155,24 @@ createjs.indexOf = function (array, searchElement){
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/duration:property"}}{{/crossLink}} directly as a property
-	 *
-	 * @deprecated
-	 * @method getDuration
+	 * Please use {{#crossLink "AbstractSoundInstance/duration:property"}}{{/crossLink}} directly as a property
+	 * @method _getDuration
+	 * @protected
 	 * @return {Number} The duration of the sound instance in milliseconds.
 	 */
-	p.getDuration = function () {
+	p._getDuration = function () {
 		return this._duration;
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/duration:property"}}{{/crossLink}} directly as a property
-	 *
-	 * @deprecated
-	 * @method setDuration
+	 * Please use {{#crossLink "AbstractSoundInstance/duration:property"}}{{/crossLink}} directly as a property
+	 * @method _setDuration
+	 * @protected
 	 * @param {number} value The new duration time in milli seconds.
 	 * @return {AbstractSoundInstance} Returns reference to itself for chaining calls
 	 * @since 0.6.0
 	 */
-	p.setDuration = function (value) {
+	p._setDuration = function (value) {
 		if (value == this._duration) { return this; }
 		this._duration = Math.max(0, value || 0);
 		this._updateDuration();
@@ -26829,54 +26180,50 @@ createjs.indexOf = function (array, searchElement){
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/playbackResource:property"}}{{/crossLink}} directly as a property
-	 *
-	 * @deprecated
-	 * @method setPlayback
+	 * Please use {{#crossLink "AbstractSoundInstance/playbackResource:property"}}{{/crossLink}} directly as a property
+	 * @method _setPlaybackResource
+	 * @protected
 	 * @param {Object} value The new playback resource.
 	 * @return {AbstractSoundInstance} Returns reference to itself for chaining calls
 	 * @since 0.6.0
 	 **/
-	p.setPlaybackResource = function (value) {
+	p._setPlaybackResource = function (value) {
 		this._playbackResource = value;
-		if (this._duration == 0) { this._setDurationFromSource(); }
+		if (this._duration == 0 && this._playbackResource) { this._setDurationFromSource(); }
 		return this;
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/playbackResource:property"}}{{/crossLink}} directly as a property
-	 *
-	 * @deprecated
-	 * @method setPlayback
+	 * Please use {{#crossLink "AbstractSoundInstance/playbackResource:property"}}{{/crossLink}} directly as a property
+	 * @method _getPlaybackResource
+	 * @protected
 	 * @param {Object} value The new playback resource.
 	 * @return {Object} playback resource used for playing audio
 	 * @since 0.6.0
 	 **/
-	p.getPlaybackResource = function () {
+	p._getPlaybackResource = function () {
 		return this._playbackResource;
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/loop:property"}}{{/crossLink}} directly as a property
-	 *
-	 * @deprecated
-	 * @method getLoop
+	 * Please use {{#crossLink "AbstractSoundInstance/loop:property"}}{{/crossLink}} directly as a property
+	 * @method _getLoop
+	 * @protected
 	 * @return {number}
 	 * @since 0.6.0
 	 **/
-	p.getLoop = function () {
+	p._getLoop = function () {
 		return this._loop;
 	};
 
 	/**
-	 * DEPRECATED, please use {{#crossLink "AbstractSoundInstance/loop:property"}}{{/crossLink}} directly as a property,
-	 *
-	 * @deprecated
-	 * @method setLoop
+	 * Please use {{#crossLink "AbstractSoundInstance/loop:property"}}{{/crossLink}} directly as a property
+	 * @method _setLoop
+	 * @protected
 	 * @param {number} value The number of times to loop after play.
 	 * @since 0.6.0
 	 */
-	p.setLoop = function (value) {
+	p._setLoop = function (value) {
 		if(this._playbackResource != null) {
 			// remove looping
 			if (this._loop != 0 && value == 0) {
@@ -26937,13 +26284,13 @@ createjs.indexOf = function (array, searchElement){
 	 */
 	// OJR FlashAudioSoundInstance overwrites
 	p._beginPlaying = function (playProps) {
-		this.setPosition(playProps.offset);
-		this.setLoop(playProps.loop);
-		this.setVolume(playProps.volume);
-		this.setPan(playProps.pan);
+		this._setPosition(playProps.offset);
+		this._setLoop(playProps.loop);
+		this._setVolume(playProps.volume);
+		this._setPan(playProps.pan);
 		if (playProps.startTime != null) {
-			this.setStartTime(playProps.startTime);
-			this.setDuration(playProps.duration);
+			this._setStartTime(playProps.startTime);
+			this._setDuration(playProps.duration);
 		}
 
 		if (this._playbackResource != null && this._position < this._duration) {
@@ -27226,20 +26573,6 @@ createjs.indexOf = function (array, searchElement){
 	};
 	var p = AbstractPlugin.prototype;
 
-	/**
-	 * <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
-	 * See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
-	 * for details.
-	 *
-	 * There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
-	 *
-	 * @method initialize
-	 * @protected
-	 * @deprecated
-	 */
-	// p.initialize = function() {}; // searchable for devs wondering where it is.
-
-
 // Static Properties:
 // NOTE THESE PROPERTIES NEED TO BE ADDED TO EACH PLUGIN
 	/**
@@ -27247,7 +26580,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @property _capabilities
 	 * @type {Object}
 	 * @default null
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	AbstractPlugin._capabilities = null;
@@ -27362,6 +26695,11 @@ createjs.indexOf = function (array, searchElement){
 			this._soundInstances[src].push(si);
 		}
 
+		// Plugins that don't have a setVolume should implement a setMasterVolune/setMasterMute
+		// So we have to check that here.
+		si.setMasterVolume && si.setMasterVolume(createjs.Sound.volume);
+		si.setMasterMute && si.setMasterMute(createjs.Sound.muted);
+
 		return si;
 	};
 
@@ -27392,7 +26730,7 @@ createjs.indexOf = function (array, searchElement){
 	 * Mute all sounds via the plugin.
 	 * @method setMute
 	 * @param {Boolean} value If all sound should be muted or not. Note that plugin-level muting just looks up
-	 * the mute value of Sound {{#crossLink "Sound/getMute"}}{{/crossLink}}, so this property is not used here.
+	 * the mute value of Sound {{#crossLink "Sound/muted:property"}}{{/crossLink}}, so this property is not used here.
 	 * @return {Boolean} If the mute call succeeds.
 	 */
 	p.setMute = function (value) {
@@ -27410,6 +26748,7 @@ createjs.indexOf = function (array, searchElement){
 	/**
 	 * Handles internal preload completion.
 	 * @method _handlePreloadComplete
+	 * @param event
 	 * @protected
 	 */
 	p._handlePreloadComplete = function (event) {
@@ -27424,7 +26763,7 @@ createjs.indexOf = function (array, searchElement){
 	};
 
 	/**
-	 * Handles internal preload erros
+	 * Handles internal preload errors
 	 * @method _handlePreloadError
 	 * @param event
 	 * @protected
@@ -27462,14 +26801,10 @@ createjs.indexOf = function (array, searchElement){
 	 * @protected
 	 */
 	function Loader(loadItem) {
-		this.AbstractLoader_constructor(loadItem, true, createjs.AbstractLoader.SOUND);
+		this.AbstractLoader_constructor(loadItem, true, createjs.Types.SOUND);
 
 	};
 	var p = createjs.extend(Loader, createjs.AbstractLoader);
-
-	// TODO: deprecated
-	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
-
 
 	/**
 	 * web audio context required for decoding audio
@@ -27614,10 +26949,6 @@ createjs.indexOf = function (array, searchElement){
 	var p = createjs.extend(WebAudioSoundInstance, createjs.AbstractSoundInstance);
 	var s = WebAudioSoundInstance;
 
-	// TODO: deprecated
-	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
-
-
 	/**
 	 * Note this is only intended for use by advanced users.
 	 * <br />Audio context used to create nodes.  This is and needs to be the same context used by {{#crossLink "WebAudioPlugin"}}{{/crossLink}}.
@@ -27704,7 +27035,7 @@ createjs.indexOf = function (array, searchElement){
 
 		clearTimeout(this._soundCompleteTimeout);
 
-		this._playbackStartTime = 0;	// This is used by getPosition
+		this._playbackStartTime = 0;	// This is used by _getPosition
 	};
 
 	/**
@@ -27920,10 +27251,6 @@ createjs.indexOf = function (array, searchElement){
 	}
 	var p = createjs.extend(WebAudioPlugin, createjs.AbstractPlugin);
 
-	// TODO: deprecated
-	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
-
-
 // Static Properties
 	var s = WebAudioPlugin;
 	/**
@@ -27932,7 +27259,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @property _capabilities
 	 * @type {Object}
 	 * @default null
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	s._capabilities = null;
@@ -27941,7 +27268,7 @@ createjs.indexOf = function (array, searchElement){
 	 * Value to set panning model to equal power for WebAudioSoundInstance.  Can be "equalpower" or 0 depending on browser implementation.
 	 * @property _panningModel
 	 * @type {Number / String}
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	s._panningModel = "equalpower";
@@ -27968,7 +27295,7 @@ createjs.indexOf = function (array, searchElement){
 	 *
 	 * @property _scratchBuffer
 	 * @type {AudioBuffer}
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	 s._scratchBuffer = null;
@@ -27983,6 +27310,14 @@ createjs.indexOf = function (array, searchElement){
 	 */
 	s._unlocked = false;
 
+	/**
+	 * The default sample rate used when checking for iOS compatibility. See {{#crossLink "WebAudioPlugin/_createAudioContext"}}{{/crossLink}}.
+	 * @property DEFAULT_SAMPLE_REATE
+	 * @type {number}
+	 * @default 44100
+	 * @static
+	 */
+	s.DEFAULT_SAMPLE_RATE = 44100;
 
 // Static Public Methods
 	/**
@@ -28032,7 +27367,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @method _isFileXHRSupported
 	 * @return {Boolean} If XHR is supported.
 	 * @since 0.4.2
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	s._isFileXHRSupported = function() {
@@ -28061,11 +27396,11 @@ createjs.indexOf = function (array, searchElement){
 	};
 
 	/**
-	 * Determine the capabilities of the plugin. Used internally. Please see the Sound API {{#crossLink "Sound/getCapabilities"}}{{/crossLink}}
+	 * Determine the capabilities of the plugin. Used internally. Please see the Sound API {{#crossLink "Sound/capabilities:property"}}{{/crossLink}}
 	 * method for an overview of plugin capabilities.
 	 * @method _generateCapabilities
 	 * @static
-	 * @protected
+	 * @private
 	 */
 	s._generateCapabilities = function () {
 		if (s._capabilities != null) {return;}
@@ -28074,13 +27409,8 @@ createjs.indexOf = function (array, searchElement){
 		if (t.canPlayType == null) {return null;}
 
 		if (s.context == null) {
-			if (window.AudioContext) {
-				s.context = new AudioContext();
-			} else if (window.webkitAudioContext) {
-				s.context = new webkitAudioContext();
-			} else {
-				return null;
-			}
+			s.context = s._createAudioContext();
+			if (s.context == null) { return null; }
 		}
 		if (s._scratchBuffer == null) {
 			s._scratchBuffer = s.context.createBuffer(1, 1, 22050);
@@ -28095,7 +27425,6 @@ createjs.indexOf = function (array, searchElement){
 			document.addEventListener("touchstart", s._unlock, true);
 			document.addEventListener("touchend", s._unlock, true);
 		}
-
 
 		s._capabilities = {
 			panning:true,
@@ -28120,6 +27449,43 @@ createjs.indexOf = function (array, searchElement){
 	};
 
 	/**
+	 * Create an audio context for the sound.
+	 *
+	 * This method handles both vendor prefixes (specifically webkit support), as well as a case on iOS where
+	 * audio played with a different sample rate may play garbled when first started. The default sample rate is
+	 * 44,100, however it can be changed using the {{#crossLink "WebAudioPlugin/DEFAULT_SAMPLE_RATE:property"}}{{/crossLink}}.
+	 * @method _createAudioContext
+	 * @return {AudioContext | webkitAudioContext}
+	 * @private
+	 * @static
+	 * @since 1.0.0
+	 */
+	s._createAudioContext = function() {
+		// Slightly modified version of https://github.com/Jam3/ios-safe-audio-context
+		// Resolves issues with first-run contexts playing garbled on iOS.
+		var AudioCtor = (window.AudioContext || window.webkitAudioContext);
+		if (AudioCtor == null) { return null; }
+		var context = new AudioCtor();
+
+		// Check if hack is necessary. Only occurs in iOS6+ devices
+		// and only when you first boot the iPhone, or play a audio/video
+		// with a different sample rate
+		if (/(iPhone|iPad)/i.test(navigator.userAgent)
+				&& context.sampleRate !== s.DEFAULT_SAMPLE_RATE) {
+			var buffer = context.createBuffer(1, 1, s.DEFAULT_SAMPLE_RATE),
+					dummy = context.createBufferSource();
+			dummy.buffer = buffer;
+			dummy.connect(context.destination);
+			dummy.start(0);
+			dummy.disconnect();
+			context.close() // dispose old context
+
+			context = new AudioCtor();
+		}
+		return context;
+	}
+
+	/**
 	 * Set up compatibility if only deprecated web audio calls are supported.
 	 * See http://www.w3.org/TR/webaudio/#DeprecationNotes
 	 * Needed so we can support new browsers that don't support deprecated calls (Firefox) as well as old browsers that
@@ -28127,7 +27493,7 @@ createjs.indexOf = function (array, searchElement){
 	 *
 	 * @method _compatibilitySetUp
 	 * @static
-	 * @protected
+	 * @private
 	 * @since 0.4.2
 	 */
 	s._compatibilitySetUp = function() {
@@ -28236,7 +27602,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @property _tags
 	 * @type {{}}
 	 * @static
-	 * @protected
+	 * @private
 	 */
 	s._tags = {};
 
@@ -28245,7 +27611,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @property _tagPool
 	 * @type {TagPool}
 	 * @static
-	 * @protected
+	 * @private
 	 */
 	s._tagPool = new TagPool();
 
@@ -28253,7 +27619,7 @@ createjs.indexOf = function (array, searchElement){
 	 * A hash lookup of if a base audio tag is available, indexed by the audio source
 	 * @property _tagsUsed
 	 * @type {{}}
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	s._tagUsed = {};
@@ -28449,10 +27815,6 @@ createjs.indexOf = function (array, searchElement){
 		}
 	}
 	var p = createjs.extend(HTMLAudioSoundInstance, createjs.AbstractSoundInstance);
-
-	// TODO: deprecated
-	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
-
 
 // Public Methods
 	/**
@@ -28717,18 +28079,6 @@ createjs.indexOf = function (array, searchElement){
 
 
 	// Public Properties
-		/**
-		 * This is no longer needed as we are now using object pooling for tags.
-		 *
-		 * <b>NOTE this property only exists as a limitation of HTML audio.</b>
-		 * @property defaultNumChannels
-		 * @type {Number}
-		 * @default 2
-		 * @since 0.4.0
-		 * @deprecated
-		 */
-		this.defaultNumChannels = 2;
-
 		this._capabilities = s._capabilities;
 
 		this._loaderClass = createjs.SoundLoader;
@@ -28737,10 +28087,6 @@ createjs.indexOf = function (array, searchElement){
 
 	var p = createjs.extend(HTMLAudioPlugin, createjs.AbstractPlugin);
 	var s = HTMLAudioPlugin;
-
-	// TODO: deprecated
-	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
-
 
 // Static Properties
 	/**
@@ -28760,7 +28106,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @type {String}
 	 * @default canplaythrough
 	 * @static
-	 * @protected
+	 * @private
 	 */
 	s._AUDIO_READY = "canplaythrough";
 
@@ -28770,7 +28116,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @type {String}
 	 * @default ended
 	 * @static
-	 * @protected
+	 * @private
 	 */
 	s._AUDIO_ENDED = "ended";
 
@@ -28780,7 +28126,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @type {String}
 	 * @default seeked
 	 * @static
-	 * @protected
+	 * @private
 	 */
 	s._AUDIO_SEEKED = "seeked";
 
@@ -28790,7 +28136,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @type {String}
 	 * @default stalled
 	 * @static
-	 * @protected
+	 * @private
 	 */
 	s._AUDIO_STALLED = "stalled";
 
@@ -28801,17 +28147,17 @@ createjs.indexOf = function (array, searchElement){
 	 * @type {String}
 	 * @default timeupdate
 	 * @static
-	 * @protected
+	 * @private
 	 */
 	s._TIME_UPDATE = "timeupdate";
 
 	/**
 	 * The capabilities of the plugin. This is generated via the {{#crossLink "HTMLAudioPlugin/_generateCapabilities"}}{{/crossLink}}
-	 * method. Please see the Sound {{#crossLink "Sound/getCapabilities"}}{{/crossLink}} method for an overview of all
+	 * method. Please see the Sound {{#crossLink "Sound/capabilities:property"}}{{/crossLink}} method for an overview of all
 	 * of the available properties.
 	 * @property _capabilities
 	 * @type {Object}
-	 * @protected
+	 * @private
 	 * @static
 	 */
 	s._capabilities = null;
@@ -28831,11 +28177,11 @@ createjs.indexOf = function (array, searchElement){
 	};
 
 	/**
-	 * Determine the capabilities of the plugin. Used internally. Please see the Sound API {{#crossLink "Sound/getCapabilities"}}{{/crossLink}}
+	 * Determine the capabilities of the plugin. Used internally. Please see the Sound API {{#crossLink "Sound/capabilities:property"}}{{/crossLink}}
 	 * method for an overview of plugin capabilities.
 	 * @method _generateCapabilities
 	 * @static
-	 * @protected
+	 * @private
 	 */
 	s._generateCapabilities = function () {
 		if (s._capabilities != null) {return;}
@@ -28875,7 +28221,7 @@ createjs.indexOf = function (array, searchElement){
 
 	p.create = function (src, startTime, duration) {
 		var si = this.AbstractPlugin_create(src, startTime, duration);
-		si.setPlaybackResource(null);
+		si.playbackResource = null;
 		return si;
 	};
 
@@ -28902,7 +28248,17 @@ createjs.indexOf = function (array, searchElement){
 	/**
 	 * Base class that both {{#crossLink "Tween"}}{{/crossLink}} and {{#crossLink "Timeline"}}{{/crossLink}} extend. Should not be instantiated directly.
 	 * @class AbstractTween
-	 * @param {Object} [props]
+	 * @param {Object} [props] The configuration properties to apply to this instance (ex. `{loop:-1, paused:true}`).
+	 * Supported props are listed below. These props are set on the corresponding instance properties except where
+	 * specified.
+	 * @param {boolean} [props.useTicks=false]  See the {{#crossLink "AbstractTween/useTicks:property"}}{{/crossLink}} property for more information.
+	 * @param {boolean} [props.ignoreGlobalPause=false] See the {{#crossLink "AbstractTween/ignoreGlobalPause:property"}}{{/crossLink}} for more information.
+	 * @param {number|boolean} [props.loop=0] See the {{#crossLink "AbstractTween/loop:property"}}{{/crossLink}} for more information.
+	 * @param {boolean} [props.reversed=false] See the {{#crossLink "AbstractTween/reversed:property"}}{{/crossLink}} for more information.
+	 * @param {boolean} [props.bounce=false] See the {{#crossLink "AbstractTween/bounce:property"}}{{/crossLink}} for more information.
+	 * @param {number} [props.timeScale=1] See the {{#crossLink "AbstractTween/timeScale:property"}}{{/crossLink}} for more information.
+	 * @param {Function} [props.onChange] Adds the specified function as a listener to the {{#crossLink "AbstractTween/change:event"}}{{/crossLink}} event
+	 * @param {Function} [props.onComplete] Adds the specified function as a listener to the {{#crossLink "AbstractTween/complete:event"}}{{/crossLink}} event
 	 * @extends EventDispatcher
 	 * @constructor
 	 */
@@ -28912,8 +28268,8 @@ createjs.indexOf = function (array, searchElement){
 	// public properties:
 		/**
 		 * Causes this tween to continue playing when a global pause is active. For example, if TweenJS is using {{#crossLink "Ticker"}}{{/crossLink}},
-		 * then setting this to false (the default) will cause this tween to be paused when `Ticker.setPaused(true)`
-		 * is called. See the {{#crossLink "Tween/tick"}}{{/crossLink}} method for more info. Can be set via the `props`
+		 * then setting this to false (the default) will cause this tween to be paused when `Ticker.paused` is set to
+		 * `true`. See the {{#crossLink "Tween/tick"}}{{/crossLink}} method for more info. Can be set via the `props`
 		 * parameter.
 		 * @property ignoreGlobalPause
 		 * @type Boolean
@@ -28923,6 +28279,9 @@ createjs.indexOf = function (array, searchElement){
 	
 		/**
 		 * Indicates the number of times to loop. If set to -1, the tween will loop continuously.
+		 *
+		 * Note that a tween must loop at _least_ once to see it play in both directions when `{{#crossLink "AbstractTween/bounce:property"}}{{/crossLink}}`
+		 * is set to `true`.
 		 * @property loop
 		 * @type {Number}
 		 * @default 0
@@ -28948,7 +28307,9 @@ createjs.indexOf = function (array, searchElement){
 		this.reversed = false;
 		
 		/**
-		 * Causes the tween to reverse direction at the end of each loop.
+		 * Causes the tween to reverse direction at the end of each loop. Each single-direction play-through of the
+		 * tween counts as a single bounce. For example, to play a tween once forward, and once back, set the
+		 * `{{#crossLink "AbstractTween/loop:property"}}{{/crossLink}}` to `1`.
 		 * @property bounce
 		 * @type {Boolean}
 		 * @default false
@@ -29058,9 +28419,6 @@ createjs.indexOf = function (array, searchElement){
 
 	var p = createjs.extend(AbstractTween, createjs.EventDispatcher);
 
-	// TODO: deprecated
-	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
-
 // events:
 	/**
 	 * Dispatched whenever the tween's position changes. It occurs after all tweened properties are updated and actions
@@ -29078,42 +28436,45 @@ createjs.indexOf = function (array, searchElement){
 	
 	/**
 	 * Use the {{#crossLink "AbstractTween/paused:property"}}{{/crossLink}} property instead.
-	 * @method setPaused
+	 * @method _setPaused
 	 * @param {Boolean} [value=true] Indicates whether the tween should be paused (`true`) or played (`false`).
-	 * @return {Tween} This tween instance (for chaining calls)
-	 * @deprecated
+	 * @return {AbstractTween} This tween instance (for chaining calls)
+	 * @protected
 	 * @chainable
 	 */
-	p.setPaused = function(value) {
+	p._setPaused = function(value) {
 		createjs.Tween._register(this, value);
 		return this;
 	};
+	p.setPaused = createjs.deprecate(p._setPaused, "AbstractTween.setPaused");
 	
 	/**
 	 * Use the {{#crossLink "AbstractTween/paused:property"}}{{/crossLink}} property instead.
-	 * @method getPaused
-	 * @deprecated
+	 * @method _getPaused
+	 * @protected
 	 */
-	p.getPaused = function() { 
+	p._getPaused = function() {
 		return this._paused;
 	};
+	p.getPaused = createjs.deprecate(p._getPaused, "AbstactTween.getPaused");
 	
 	/**
-	 * 
-	 * @method getCurrentLabel
+	 * Use the {{#crossLink "AbstractTween/currentLabel:property"}}{{/crossLink}} property instead.
+	 * @method _getCurrentLabel
+	 * @protected
 	 * @return {String} The name of the current label or null if there is no label
-	 * @deprecated
 	 **/
-	p.getCurrentLabel = function(pos) {
+	p._getCurrentLabel = function(pos) {
 		var labels = this.getLabels();
 		if (pos == null) { pos = this.position; }
 		for (var i = 0, l = labels.length; i<l; i++) { if (pos < labels[i].position) { break; } }
 		return (i===0) ? null : labels[i-1].label;
 	};
+	p.getCurrentLabel = createjs.deprecate(p._getCurrentLabel, "AbstractTween.getCurrentLabel");
 	
 	/**
-	 * Pauses or unpauses the tween. A paused tween is removed from the global registry and is eligible for garbage collection
-	 * if no other references to it exist.
+	 * Pauses or unpauses the tween. A paused tween is removed from the global registry and is eligible for garbage
+	 * collection if no other references to it exist.
 	 * @property paused
 	 * @type Boolean
 	 * @readonly
@@ -29121,7 +28482,7 @@ createjs.indexOf = function (array, searchElement){
 	 
 	/**
 	 * Returns the name of the label on or immediately before the current position. For example, given a tween with
-	 * two labels, "first" on frame index 4, and "second" on frame 8, getCurrentLabel would return:
+	 * two labels, "first" on frame index 4, and "second" on frame 8, `currentLabel` would return:
 	 * <UL>
 	 * 		<LI>null if the current position is 2.</LI>
 	 * 		<LI>"first" if the current position is 4.</LI>
@@ -29132,11 +28493,11 @@ createjs.indexOf = function (array, searchElement){
 	 * @type String
 	 * @readonly
 	 **/
-	
+	 
 	try {
 		Object.defineProperties(p, {
-			paused: { set: p.setPaused, get: p.getPaused },
-			currentLabel: { get: p.getCurrentLabel }
+			paused: { set: p._setPaused, get: p._getPaused },
+			currentLabel: { get: p._getCurrentLabel }
 		});
 	} catch (e) {}
 
@@ -29444,19 +28805,19 @@ createjs.indexOf = function (array, searchElement){
 	 * @param {Object} target The target object that will have its properties tweened.
 	 * @param {Object} [props] The configuration properties to apply to this instance (ex. `{loop:-1, paused:true}`).
 	 * Supported props are listed below. These props are set on the corresponding instance properties except where
-	 * specified.<UL>
-	 *    <LI> `useTicks`</LI>
-	 *    <LI> `ignoreGlobalPause`</LI>
-	 *    <LI> `loop`</LI>
-	 *    <LI> `reversed`</LI>
-	 *    <LI> `bounce`</LI>
-	 *    <LI> `timeScale`</LI>
-	 *    <LI> `pluginData`</LI>
-	 *    <LI> `paused`</LI>
-	 *    <LI> `position`: indicates the initial position for this tween.</LI>
-	 *    <LI> `onChange`: adds the specified function as a listener to the `change` event</LI>
-	 *    <LI> `onComplete`: adds the specified function as a listener to the `complete` event</LI>
-	 *    <LI> `override`: if true, removes all existing tweens for the target</LI>
+	 * specified.
+	 * @param {boolean} [props.useTicks=false]  See the {{#crossLink "AbstractTween/useTicks:property"}}{{/crossLink}} property for more information.
+	 * @param {boolean} [props.ignoreGlobalPause=false] See the {{#crossLink "AbstractTween/ignoreGlobalPause:property"}}{{/crossLink}} for more information.
+	 * @param {number|boolean} [props.loop=0] See the {{#crossLink "AbstractTween/loop:property"}}{{/crossLink}} for more information.
+	 * @param {boolean} [props.reversed=false] See the {{#crossLink "AbstractTween/reversed:property"}}{{/crossLink}} for more information.
+	 * @param {boolean} [props.bounce=false] See the {{#crossLink "AbstractTween/bounce:property"}}{{/crossLink}} for more information.
+	 * @param {number} [props.timeScale=1] See the {{#crossLink "AbstractTween/timeScale:property"}}{{/crossLink}} for more information.
+	 * @param {object} [props.pluginData] See the {{#crossLink "Tween/pluginData:property"}}{{/crossLink}} for more information.
+	 * @param {boolean} [props.paused=false] See the {{#crossLink "AbstractTween/paused:property"}}{{/crossLink}} for more information.
+	 * @param {number} [props.position=0] The initial position for this tween. See {{#crossLink "AbstractTween/position:property"}}{{/crossLink}}
+	 * @param {Function} [props.onChange] Adds the specified function as a listener to the {{#crossLink "AbstractTween/change:event"}}{{/crossLink}} event
+	 * @param {Function} [props.onComplete] Adds the specified function as a listener to the {{#crossLink "AbstractTween/complete:event"}}{{/crossLink}} event
+	 * @param {boolean} [props.override=false] Removes all existing tweens for the target when set to `true`.
 	 * </UL>
 	 * @extends AbstractTween
 	 * @constructor
@@ -29580,10 +28941,6 @@ createjs.indexOf = function (array, searchElement){
 
 	var p = createjs.extend(Tween, createjs.AbstractTween);
 
-	// TODO: deprecated
-	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
-	
-
 // static properties
 
 	/**
@@ -29641,20 +28998,19 @@ createjs.indexOf = function (array, searchElement){
 	 * @param {Object} target The target object that will have its properties tweened.
 	 * @param {Object} [props] The configuration properties to apply to this instance (ex. `{loop:-1, paused:true}`).
 	 * Supported props are listed below. These props are set on the corresponding instance properties except where
-	 * specified.<UL>
-	 *    <LI> `useTicks`</LI>
-	 *    <LI> `ignoreGlobalPause`</LI>
-	 *    <LI> `loop`</LI>
-	 *    <LI> `reversed`</LI>
-	 *    <LI> `bounce`</LI>
-	 *    <LI> `timeScale`</LI>
-	 *    <LI> `pluginData`</LI>
-	 *    <LI> `paused`</LI>
-	 *    <LI> `position`: indicates the initial position for this tween.</LI>
-	 *    <LI> `onChange`: adds the specified function as a listener to the `change` event</LI>
-	 *    <LI> `onComplete`: adds the specified function as a listener to the `complete` event</LI>
-	 *    <LI> `override`: if true, removes all existing tweens for the target</LI>
-	 * </UL>
+	 * specified.
+	 * @param {boolean} [props.useTicks=false]  See the {{#crossLink "AbstractTween/useTicks:property"}}{{/crossLink}} property for more information.
+	 * @param {boolean} [props.ignoreGlobalPause=false] See the {{#crossLink "AbstractTween/ignoreGlobalPause:property"}}{{/crossLink}} for more information.
+	 * @param {number|boolean} [props.loop=0] See the {{#crossLink "AbstractTween/loop:property"}}{{/crossLink}} for more information.
+	 * @param {boolean} [props.reversed=false] See the {{#crossLink "AbstractTween/reversed:property"}}{{/crossLink}} for more information.
+	 * @param {boolean} [props.bounce=false] See the {{#crossLink "AbstractTween/bounce:property"}}{{/crossLink}} for more information.
+	 * @param {number} [props.timeScale=1] See the {{#crossLink "AbstractTween/timeScale:property"}}{{/crossLink}} for more information.
+	 * @param {object} [props.pluginData] See the {{#crossLink "Tween/pluginData:property"}}{{/crossLink}} for more information.
+	 * @param {boolean} [props.paused=false] See the {{#crossLink "AbstractTween/paused:property"}}{{/crossLink}} for more information.
+	 * @param {number} [props.position=0] The initial position for this tween. See {{#crossLink "AbstractTween/position:property"}}{{/crossLink}}
+	 * @param {Function} [props.onChange] Adds the specified function as a listener to the {{#crossLink "AbstractTween/change:event"}}{{/crossLink}} event
+	 * @param {Function} [props.onComplete] Adds the specified function as a listener to the {{#crossLink "AbstractTween/complete:event"}}{{/crossLink}} event
+	 * @param {boolean} [props.override=false] Removes all existing tweens for the target when set to `true`.
 	 * @return {Tween} A reference to the created tween.
 	 * @static
 	 */
@@ -30072,7 +29428,7 @@ createjs.indexOf = function (array, searchElement){
 		var initProps = this._stepHead.props, target = this.target, plugins = Tween._plugins;
 		var n, i, value, initValue, inject;
 		var oldStep = step.prev, oldProps = oldStep.props;
-		var stepProps = step.props = this._cloneProps(oldProps);
+		var stepProps = step.props || (step.props = this._cloneProps(oldProps));
 		var cleanProps = {}; // TODO: is there some way to avoid this additional object?
 
 		for (n in props) {
@@ -30278,9 +29634,6 @@ createjs.indexOf = function (array, searchElement){
 	};
 	
 	var p = createjs.extend(Timeline, createjs.AbstractTween);
-
-	// TODO: deprecated
-	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 
 	
 // events:
@@ -30933,37 +30286,49 @@ createjs.indexOf = function (array, searchElement){
 	 */
 	s.step = function(tween, step, props) {
 		for (var n in props) {
-			if(n != "guide") { continue; }
+			if(n !== "guide") { continue; }
 
 			var guideData = step.props.guide;
 			var error = s._solveGuideData(props.guide, guideData);
 			guideData.valid = !error;
 
+			var end = guideData.endData;
+			tween._injectProp("x", end.x);
+			tween._injectProp("y", end.y);
+
 			if(error || !guideData.orient) { break; }
 
 			var initRot = step.prev.props.rotation === undefined ? (tween.target.rotation || 0) : step.prev.props.rotation;
-			var finalRot = props.rotation === undefined ? (tween.target.rotation || 0) : props.rotation;
 
-			guideData.endAbsRot = finalRot;
 			guideData.startOffsetRot = initRot - guideData.startData.rotation;
 
-			var deltaRot = (finalRot - guideData.endData.rotation) - guideData.startOffsetRot;
-			var modRot = deltaRot % 360;
+			if(guideData.orient == "fixed") {
+				// controlled rotation
+				guideData.endAbsRot = end.rotation + guideData.startOffsetRot;
+				guideData.deltaRotation = 0;
+			} else {
+				// interpreted rotation
 
-			switch(guideData.orient) {
-				case "fixed":
-					guideData.deltaRotation = 0;
-					break;
-				case "auto":
-					guideData.deltaRotation = deltaRot;
-					break;
-				case "cw":
-					guideData.deltaRotation = ((modRot + 360) % 360) + (360 * Math.abs((deltaRot/360) |0));
-					break;
-				case "ccw":
-					guideData.deltaRotation = ((modRot - 360) % 360) + (-360 * Math.abs((deltaRot/360) |0));
-					break;
+				var finalRot = props.rotation === undefined ? (tween.target.rotation || 0) : props.rotation;
+				var deltaRot = (finalRot - guideData.endData.rotation) - guideData.startOffsetRot;
+				var modRot = deltaRot % 360;
+
+				guideData.endAbsRot = finalRot;
+
+				switch(guideData.orient) {
+					case "auto":
+						guideData.deltaRotation = deltaRot;
+						break;
+					case "cw":
+						guideData.deltaRotation = ((modRot + 360) % 360) + (360 * Math.abs((deltaRot/360) |0));
+						break;
+					case "ccw":
+						guideData.deltaRotation = ((modRot - 360) % 360) + (-360 * Math.abs((deltaRot/360) |0));
+						break;
+				}
 			}
+
+			tween._injectProp("rotation", guideData.endAbsRot);
 		}
 	};
 
@@ -30983,11 +30348,17 @@ createjs.indexOf = function (array, searchElement){
 	s.change = function(tween, step, prop, value, ratio, end) {
 		var guideData = step.props.guide;
 
-		if(!guideData) { return; }							// have no business making decisions
 		if(
-			(prop == "guide" && !guideData.valid) ||		// this data is broken
-			(prop == "x" || prop == "y") ||					// these always get over-written
-			(prop == "rotation" && guideData.orient)		// currently over-written
+				!guideData ||							// Missing data
+				(step.props === step.prev.props) || 	// In a wait()
+				(guideData === step.prev.props.guide) 	// Guide hasn't changed
+		) {
+			return; // have no business making decisions
+		}
+		if(
+				(prop === "guide" && !guideData.valid) ||		// this data is broken
+				(prop == "x" || prop == "y") ||					// these always get over-written
+				(prop === "rotation" && guideData.orient)		// currently over-written
 		){
 			return createjs.Tween.IGNORE;
 		}
@@ -31260,11 +30631,6 @@ createjs.indexOf = function (array, searchElement){
 				(cy - sy)*inv + (ey - cy)*t,
 				(cx - sx)*inv + (ex - cx)*t
 			);
-
-			console.log(
-				(cy - sy)*inv + (ey - cy)*t,
-				(cx - sx)*inv + (ex - cx)*t
-			);
 		}
 	};
 
@@ -31342,7 +30708,7 @@ createjs.indexOf = function (array, searchElement){
 	 * @type String
 	 * @static
 	 **/
-	s.buildDate = /*=date*/"Thu, 18 May 2017 18:25:57 GMT"; // injected by build process
+	s.buildDate = /*=date*/"Tue, 22 Aug 2017 12:38:09 GMT"; // injected by build process
 
 })();/*
 * Adding module.exports
